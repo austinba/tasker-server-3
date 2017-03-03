@@ -1,0 +1,11 @@
+{
+  "presets": [
+    "node6"
+  ],
+  "plugins" : [
+    [ "babel-plugin-root-import", {
+      "rootPathSuffix": "src"
+    }],
+    "transform-object-rest-spread"
+  ]
+}
