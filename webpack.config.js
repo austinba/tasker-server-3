@@ -11,9 +11,11 @@ module.exports = {
     filename: 'index.js'
   },
   plugins: [
-    // new CleanWebpackPlugin(['dist']), {
-    //   root:
-    // }),
+    new CleanWebpackPlugin(['dist'], {
+      root: __dirname,
+      verbose: true,
+      dry: false,
+    }),
     new CopyWebpackPlugin([
       { from: 'deploy_package.json', to: 'package.json' },
       { from: 'app_config.json' },
