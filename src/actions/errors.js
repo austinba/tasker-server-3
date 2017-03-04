@@ -1,0 +1,6 @@
+const e = {};
+e.USER_EXISTS = 'USER_EXISTS';
+e.INVALID_TOKEN = 'INVALID_TOKEN';
+e.INVALID_PASSWORD = 'INVALID_PASSWORD';
+
+export default e;

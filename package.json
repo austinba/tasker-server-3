@@ -2,10 +2,10 @@
   "name": "tasker-server-3",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "build-start": "webpack && node dist/index.js",
+    "start": "NODE_ENV=production node server.js",
+    "dev": "webpack --watch src & NODE_ENV=dev nodemon --watch dist dist/server.js",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1",
     "local-database": "java -Djava.library.path=~/Downloads/dynamodb_local_latest/DynamoDBLocal_lib -jar ~/Downloads/dynamodb_local_latest/DynamoDBLocal.jar -sharedDb -inMemory"
@@ -15,7 +15,6 @@
   "dependencies": {
     "aws": "0.0.3-2",
     "bluebird": "3.4.7",
-    "copy-webpack-plugin": "4.0.1",
     "dynogels": "7.1.0",
     "express": "4.15.0",
     "fs": "0.0.1-security",
@@ -23,7 +22,7 @@
     "ramda": "0.23.0",
     "underscore": "1.8.3",
     "webpack": "2.2.1",
-    "zip-webpack-plugin": "1.0.0"
+    "winston": "2.3.1"
   },
   "devDependencies": {
     "babel-cli": "6.23.0",
@@ -31,6 +30,8 @@
     "babel-plugin-root-import": "5.0.0",
     "babel-plugin-transform-object-rest-spread": "6.23.0",
     "babel-preset-node6": "11.0.0",
-    "clean-webpack-plugin": "0.1.15"
+    "clean-webpack-plugin": "0.1.15",
+    "copy-webpack-plugin": "4.0.1",
+    "zip-webpack-plugin": "1.0.0"
   }
 }
