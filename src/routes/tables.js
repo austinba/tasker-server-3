@@ -1,7 +1,6 @@
 import * as tableActions from '../actions/tables';
 import { prettyJSON } from '../helpers';
 import express from 'express';
-const app = express();
 const router = express.Router();
 
 router.get('/create', function(req, res) {

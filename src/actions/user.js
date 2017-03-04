@@ -87,20 +87,24 @@ export function createUserToken(fields) {
 }
 
 /** Gets the userID based on the username and teamDomain */
-export function getUserID(fields) {
-  const requiredFields = ['username', 'teamDomain'];
-  const result = Promise
-    .resolve(fields)
-    .then(rejectIfMissingFields(requiredFields))
-    .then(fields => {
-      User
-        .scan()
-        .where('username').equals(fields.username)
-        .where('teamDomain').equals(fields.teamDomain)
-        .limit(1)
-        .exec()
-    })
-}
+// export function getUserFromUsername(fields) {
+//   const requiredFields = ['username', 'teamDomain'];
+//   const result = Promise
+//     .resolve(fields)
+//     .then(rejectIfMissingFields(requiredFields))
+//     .then(fields => {
+//       const results =
+//         User
+//           .scan()
+//           .where('username').equals(fields.username)
+//           .where('teamDomain').equals(fields.teamDomain)
+//           .limit(1)
+//           .execAsync()
+//           .then();
+//       results.Items[0]
+//
+//     })
+// }
 //// TODO: Replace with a global secondary index in the future
 
 
