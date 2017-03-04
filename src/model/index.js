@@ -2,25 +2,39 @@ import dynogels from 'dynogels';
 import * as Joi from 'joi';
 import Promise from 'bluebird';
 import _ from 'underscore';
-// import config from '~/../config.json';
+import R from 'ramda';
 
-// dynogels.AWS.config.update(config.dynamoDB);
-console.log(`Actual process.env.NODE_ENV: ${process.env.NODE_ENV}`);
-
-var env = process.env.NODE_ENV || 'production';
-
-console.log(`Current Environment: ${env}`);
-
-if(env === 'dev') {
+if(process.env.NODE_ENV === 'production') {
+  dynogels.AWS.config.update({ region: 'us-west-2' });
+} else {
   dynogels.AWS.config.update({
     region: 'us-west-2',
     endpoint: 'http://localhost:8000',
   });
-} else {
-  dynogels.AWS.config.update({
-    region: 'us-west-2'
-  });
 }
+
+export const Task = dynogels.define('qs-task', {
+  hashKey:         'taskID',
+  timestamps:       true,
+  schema: {
+    taskID:         dynogels.types.uuid(),
+    description:    Joi.string(),
+    dueDate:        Joi.string().isoDate(),
+    completionDate: Joi.string().isoDate(),
+    assignedFrom:   Joi.string().guid(),
+    assignedTo:     Joi.string().guid(),
+    level:          Joi.number(),
+    comments:       Joi.array().items(
+      Joi.object().keys({
+        commentID: Joi.string().guid(),
+        from: Joi.string().guid(),
+        date: Joi.string().isoDate(),
+        comment: Joi.string()
+      })
+    )
+  }
+});
+
 export const User = dynogels.define('qs-user', {
   hashKey:        'userID',
   timestamps:     true,
@@ -54,6 +68,5 @@ export const Invite = dynogels.define('qs-invite', {
   }
 });
 
-const Model = _.map({ User, Team, Invite }, Promise.promisifyAll);
-
+const Model = R.map(Promise.promisifyAll)({ User, Team, Invite, Task });
 export default Model;
