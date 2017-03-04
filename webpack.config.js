@@ -9,6 +9,12 @@ fs.readdirSync(path.resolve(__dirname, 'node_modules'))
     .filter(x => ['.bin'].indexOf(x) === -1)
     .forEach(mod => { nodeModules[mod] = `commonjs ${mod}`; });
 
+const currentVersion = fs.readFileSync('.version').toString();
+let nextVersion = currentVersion.split('.');
+nextVersion[1] = (parseInt(nextVersion[1])+100001).toString().substr(1);
+nextVersion = nextVersion.join('.');
+fs.writeFileSync('.version', nextVersion);
+
 console.log(__dirname);
 module.exports = {
   name: 'server',
@@ -28,23 +34,12 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       { from: 'package.json' },
-      { from: 'app_config.json' },
       { from: '.ebextensions/**/*', to: '.ebextensions' }
     ]),
     new ZipPlugin({
-      path: '../',
-      filename: 'server.zip',
-      pathPrefix: '',
-      // include: [/\.js$/],
-      // fileOptions: {
-      //   mtime: new Date(),
-      //   mode: 0o100664,
-      //   compress: true,
-      //   forceZip64Format: false,
-      // },
-      // zipOptions: {
-      //   forceZip64Format: false,
-      // },
+      path: './',
+      filename: currentVersion + '.zip',
+      pathPrefix: ''
     })
   ],
   module: {

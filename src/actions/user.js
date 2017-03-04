@@ -6,7 +6,8 @@ import Promise from '~/helpers/libExtensions/bluebird';
 import w from '~/helpers/winston';
 import { User } from '~/model';
 import { rejectIfMissingFields, dynogelsCallWith } from '~/actions/helpers';
-import config from '~/../config.json';
+import config from '~/../app_config.json';
+import e from '~/actions/errors.js'
 
 const JWTSecret = Buffer.from(config.jwt.secret, 'hex');
 const errors = {};

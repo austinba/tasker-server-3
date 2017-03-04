@@ -1,8 +1,0 @@
-{
-  "name": "tasker-server-3",
-  "version": "1.0.0",
-  "private": true,
-  "scripts": {
-    "start": "NODE_ENV=production node build.js"
-  }
-}
