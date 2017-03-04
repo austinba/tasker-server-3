@@ -21,7 +21,7 @@ if(env === 'dev') {
     region: 'us-west-2'
   });
 }
-export const User = dynogels.define('User', {
+export const User = dynogels.define('qs-user', {
   hashKey:        'userID',
   timestamps:     true,
   schema: {
@@ -35,7 +35,7 @@ export const User = dynogels.define('User', {
   }
 });
 
-export const Team = dynogels.define('Team', {
+export const Team = dynogels.define('qs-team', {
   hashKey:       'teamDomain',
   timestamps:    true,
   schema: {
@@ -44,7 +44,7 @@ export const Team = dynogels.define('Team', {
   }
 })
 
-export const Invite = dynogels.define('Invite', {
+export const Invite = dynogels.define('qs-invite', {
   hashKey:       'inviteID',
   timestamps:    true,
   schema: {

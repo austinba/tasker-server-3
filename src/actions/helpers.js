@@ -1,6 +1,6 @@
 import _ from 'underscore';
 import w from '~/helpers/winston';
-import Promise from '~/helpers/libExtensions/bluebird';
+import Promise from 'bluebird';
 
 const errors = {}
 errors.MISSING_FIELD= new Error('MissingField')

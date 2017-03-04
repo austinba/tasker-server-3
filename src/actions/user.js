@@ -1,8 +1,8 @@
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import normalizeEmail from 'normalize-email';
 import jwt from 'jwt-simple';
 import _ from 'underscore';
-import Promise from '~/helpers/libExtensions/bluebird';
+import Promise from 'bluebird';
 import w from '~/helpers/winston';
 import { User } from '~/model';
 import { rejectIfMissingFields, dynogelsCallWith } from '~/actions/helpers';
@@ -21,7 +21,7 @@ errors.INVALID_PASSWORD = 'INVALID_PASSWORD';
     Non-Operational Errors: MissingField, UserExists, ValidationException
 */
 export function createUser(fields) {
-  const requiredFields = ['userID', 'teamID', 'email', 'password', 'firstName', 'lastName'];
+  const requiredFields = ['username', 'teamdomain', 'email', 'password', 'firstName', 'lastName'];
   const requiredFieldsForDB = [..._.without(requiredFields, 'password'), 'passwordHash'];
   const result = Promise
     .resolve(fields)
@@ -30,7 +30,7 @@ export function createUser(fields) {
     .then(ensureUserDoesntExist)
     .then(hashPassword)
     .then(dynogelsCallWith(User.createAsync, requiredFieldsForDB))
-    .tap(fields => w.info(`Created user ${fields.userID}@${fields.teamID}`));
+    .tap(fields => w.info(`Created user ${fields.userID} ${fields.username}@${fields.teamdomain}`));
   return result;
 }
 
@@ -38,7 +38,7 @@ export function createUser(fields) {
     Non-Operational Errors: MissingField, ValidationException
 */
 export function getUser(keys) {
-  const requiredFields = ['userID', 'teamID'];
+  const requiredFields = ['userID'];
   const result = Promise
     .resolve(keys)
     .then(rejectIfMissingFields(requiredFields))
@@ -51,7 +51,7 @@ export function getUser(keys) {
     Non-Operational Errors: MissingField, ValidationException
 */
 export function deleteUser(keys) {
-  const requiredFields = ['userID', 'teamID'];
+  const requiredFields = ['userID'];
   const result = Promise
     .resolve(keys)
     .then(rejectIfMissingFields(requiredFields))
@@ -86,11 +86,29 @@ export function createUserToken(fields) {
   return result
 }
 
+/** Gets the userID based on the username and teamDomain */
+export function getUserID(fields) {
+  const requiredFields = ['username', 'teamDomain'];
+  const result = Promise
+    .resolve(fields)
+    .then(rejectIfMissingFields(requiredFields))
+    .then(fields => {
+      User
+        .scan()
+        .where('username').equals(fields.username)
+        .where('teamDomain').equals(fields.teamDomain)
+        .limit(1)
+        .exec()
+    })
+}
+//// TODO: Replace with a global secondary index in the future
+
+
 /** Checks whether a password is correct
     adds a "passwordMatches" boolean to the returned fields.
 */
 export function checkUserPassword(fields) {
-  const requiredFields = ['userID', 'teamID', 'password'];
+  const requiredFields = ['username', 'teamDomain', 'password'];
   const result = Promise.resolve(fields)
     .then(rejectIfMissingFields(requiredFields))
     .then(getUser)

@@ -34,7 +34,7 @@ module.exports = {
     }),
     new CopyWebpackPlugin([
       { from: 'package.json' },
-      { from: '.ebextensions/**/*', to: '.ebextensions' }
+      { from: '.ebextensions/**/*' }
     ]),
     new ZipPlugin({
       path: './',

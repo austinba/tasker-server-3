@@ -1,7 +1,14 @@
 import tableRouter from './routes/tables';
+import cors from 'cors';
 import express from 'express';
 const app = express();
 
+// var corsOptions = {
+//   origin: 'http://example.com',
+//   optionsSuccessStatus:200
+// };
+
+app.use(cors());
 app.get('/', (req, res) => {
   res.send('Website is running');
 });

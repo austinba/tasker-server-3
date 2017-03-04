@@ -1,5 +1,5 @@
 import _ from 'underscore';
-import Promise from '~/helpers/libExtensions/bluebird';
+import Promise from 'bluebird';
 import w from '~/helpers/winston';
 import { Team, User } from '~/model';
 import { createUser } from '~/actions/user';
