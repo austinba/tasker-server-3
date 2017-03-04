@@ -7,8 +7,9 @@ const routeHandler = (apiFn) => (req, res) => {
   console.log(req.body);
   console.log('');
   apiFn(req.body)
+    .then(data => typeof data !== 'object' ? {data} : data)
     .then(data => res.send(data))
-    .catch(err => res.status(500));
+    .catch(err => res.sendStatus(500));
 }
 
 router.post('/checkin', routeHandler(api.checkIn));
@@ -21,7 +22,7 @@ router.post('/saveComment', routeHandler(api.saveComment));
 router.post('/getUsers', routeHandler(api.getUsers));
 router.post('/markComplete', routeHandler(api.markComplete));
 router.post('/markDeleted', routeHandler(api.markDeleted));
-router.post('/unmarkComplete', routeHandler(api.markComplete));
-router.post('/unmarkDeleted', routeHandler(api.markDeleted));
+router.post('/unmarkComplete', routeHandler(api.unmarkComplete));
+router.post('/unmarkDeleted', routeHandler(api.unmarkDeleted));
 
 export default router;

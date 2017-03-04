@@ -11,14 +11,13 @@ function daysAgo(days) {
 export const tasks = [
   {
     taskID: 202,
-    dateCompleted: daysAgo(3),
+    completionDate: daysAgo(3),
     project: 'Dragonfly',
     description: 'Make sure website is ready for deployment by March 10th',
     assignedFrom: 102,
     assignedTo: 101,
-    dateDue: new Date(2017, 2, 1),
+    dueDate: new Date(2017, 2, 1),
     level: 1,
-    workedOn: hoursAgo(6),
     goal: 'Goal #1',
     comments: [
       {
@@ -34,9 +33,8 @@ export const tasks = [
     description: `We need to create a poster for the hackathon next month -- can you take care of this? Also, let me give the okay on your idea before you have the poster made.`,
     assignedFrom: 103,
     assignedTo: 101,
-    dateDue: new Date(2017, 3, 2),
+    dueDate: new Date(2017, 3, 2),
     level: 3,
-    workedOn: daysAgo(2),
     comments: [
       {
         commentID: 313,
@@ -82,9 +80,8 @@ export const tasks = [
     description: 'Create the design of the shopping website and check in with me. I think it will take about 3 back-and-forths before ready',
     assignedFrom: 101,
     assignedTo: 104,
-    dateDue: new Date(2017, 2, 2),
+    dueDate: new Date(2017, 2, 2),
     level: 1,
-    workedOn: hoursAgo(1),
     goal: 'Goal #2',
     comments: [
       {
@@ -107,9 +104,8 @@ export const tasks = [
     description: `We need to create tests for our logging system. Deployment of our Dragonfly system is scheduled on March 10th, so we absolutely have to have this done by then`,
     assignedFrom: 101,
     assignedTo: 103,
-    dateDue: new Date(2017, 2, 10),
+    dueDate: new Date(2017, 2, 10),
     level: 3,
-    workedOn: hoursAgo(0),
     comments: [
       {
         commentID: 304,
