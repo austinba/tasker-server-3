@@ -19,6 +19,7 @@
     "body-parser": "1.17.0",
     "cors": "2.8.1",
     "dynogels": "7.1.0",
+    "dynogels-promisified": "1.0.4",
     "express": "4.15.0",
     "fs": "0.0.1-security",
     "normalize-email": "1.0.0",

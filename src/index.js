@@ -1,5 +1,6 @@
 import tableRouter from './routes/tables';
 import tasksRouter from './routes/tasks';
+import usersRouter from './routes/users';
 import mockAPIRouter from './mockAPI/routes';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -19,6 +20,7 @@ app.get('/', (req, res) => {
 });
 app.use('/tables', tableRouter);
 app.use('/tasks', tasksRouter);
+app.use('/users', usersRouter);
 app.use('/mockapi', mockAPIRouter);
 
 app.set('port', process.env.PORT || 4000);

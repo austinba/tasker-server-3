@@ -1,8 +1,6 @@
 import Promise from 'bluebird';
 import dynogels from 'dynogels';
 import R from 'ramda';
-import _ from 'underscore';
-import w from '~/helpers/winston';
 import Models from '~/model';
 const createTablesAsync = Promise.promisify(dynogels.createTables);
 

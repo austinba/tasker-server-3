@@ -1,9 +1,10 @@
-import dynogels from 'dynogels';
+import dynogels from 'dynogels-promisified';
 import * as Joi from 'joi';
 import Promise from 'bluebird';
 import _ from 'underscore';
 import R from 'ramda';
 
+console.log('configuring aws', process.env.NODE_ENV);
 if(process.env.NODE_ENV === 'production') {
   dynogels.AWS.config.update({ region: 'us-west-2' });
 } else {
@@ -40,33 +41,40 @@ export const User = dynogels.define('qs-user', {
   timestamps:     true,
   schema: {
     userID:       dynogels.types.uuid(),
-    username:     Joi.string().lowercase().alphanum().min(1).max(15),
-    teamDomain:   Joi.string().lowercase().alphanum().min(1).max(15),
-    email:        Joi.string().email(),
-    passwordHash: Joi.string(),
     firstName:    Joi.string().min(1).max(30),
-    lastName:     Joi.string().min(1).max(30),
+    lastName:     Joi.string().min(1).max(30)
   }
 });
 
-export const Team = dynogels.define('qs-team', {
-  hashKey:       'teamDomain',
-  timestamps:    true,
-  schema: {
-    teamDomain:  Joi.string().lowercase().alphanum().min(1).max(15),
-    teamName:    Joi.string().min(1).max(30)
-  }
-})
+// export const User = dynogels.define('qs-user', {
+//   hashKey:        'userID',
+//   timestamps:     true,
+//   schema: {
+//     userID:       dynogels.types.uuid(),
+//     username:     Joi.string().lowercase().alphanum().min(1).max(15),
+//     teamDomain:   Joi.string().lowercase().alphanum().min(1).max(15),
+//     email:        Joi.string().email(),
+//     passwordHash: Joi.string(),
+//     firstName:    Joi.string().min(1).max(30),
+//     lastName:     Joi.string().min(1).max(30),
+//   }
+// });
 
-export const Invite = dynogels.define('qs-invite', {
-  hashKey:       'inviteID',
-  timestamps:    true,
-  schema: {
-    inviteID:    dynogels.types.uuid(),
-    toEmail:     Joi.string().email(),
-    fromUserID:  Joi.string().lowercase().alphanum().min(1).max(15)
-  }
-});
-
-const Model = R.map(Promise.promisifyAll)({ User, Team, Invite, Task });
-export default Model;
+// export const Team = dynogels.define('qs-team', {
+//   hashKey:       'teamDomain',
+//   timestamps:    true,
+//   schema: {
+//     teamDomain:  Joi.string().lowercase().alphanum().min(1).max(15),
+//     teamName:    Joi.string().min(1).max(30)
+//   }
+// })
+//
+// export const Invite = dynogels.define('qs-invite', {
+//   hashKey:       'inviteID',
+//   timestamps:    true,
+//   schema: {
+//     inviteID:    dynogels.types.uuid(),
+//     toEmail:     Joi.string().email(),
+//     fromUserID:  Joi.string().lowercase().alphanum().min(1).max(15)
+//   }
+// });

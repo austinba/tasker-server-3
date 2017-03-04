@@ -8,5 +8,4 @@ export const prettyJSON = R.pipe(
   text => JSON.stringify(text, null, 2),
   R.replace(/ /g, '&nbsp;'),
   R.replace(/\n/g, '<br />')
-  // i => console.log(i) || i
 );
