@@ -18,26 +18,43 @@ const getRecentUserIDs =
     R.dropRepeats
   );
 
+function postProcessTaskList(dbPromise) {
+  return Promise.resolve(dbPromise)
+    .then(postProcessScan)
+    .then(  // process checkIn
+      R.map(
+        R.pipe(
+          R.converge(
+            R.assoc,
+            [ R.always('lastCheckInDate'),
+              R.pipe(R.prop('checkIns'), R.defaultTo([]), R.head, R.defaultTo(0)),
+              R.identity
+            ]
+          ),
+          R.omit('checkIns')
+        )))
+    .then(
+      tasklist => ({
+        tasks: R.pipe( // sort comments and index tasks
+                 R.map(R.evolve({ comments: R.sortWith([R.descend(R.prop('date'))]) })),
+                 R.indexBy(R.prop('taskID')))(tasklist),
+        users: getRecentUserIDs(tasklist)
+    }))
+}
 export function getMyTasks() {
   return Task
     .scan()
     .where('assignedTo').equals(exampleUser)
-    .execAsync().then(postProcessScan)
-    .then(
-      tasks => ({
-        tasks: R.pipe( // sort comments and index tasks
-          R.map(R.evolve({ comments: R.sortWith([R.descend(R.prop('date'))]) })),
-          R.indexBy(R.prop('taskID'))
-        )(tasks),
-         users: getRecentUserIDs(tasks)
-    }));
+    .execAsync()
+    .then(postProcessTaskList)
 }
 
 export function getTasksIveAssigned() {
   return Task
     .scan()
     .where('assignedFrom').equals(exampleUser)
-    .execAsync().then(postProcessScan);
+    .execAsync()
+    .then(postProcessTaskList)
 }
 
 export function getTask(taskID) {
@@ -129,18 +146,19 @@ export function checkIn({taskID}) {
   const params = {};
   const newDateString = new Date().toJSON();
   const justDatePart = newDateString.split('T')[0];
-  params.UpdateExpression = '#checkIns = list_append(:newCheckIn, #checkIns)';
   params.ExpressionAttributeNames = {
     '#checkIns': 'checkIns'
   };
   params.ExpressionAttributeValues = {
-    ':newCheckIn': newDateString,
-    ':justDatePart': justDatePart
+    ':newCheckIn': [newDateString],
+    ':justDatePart': justDatePart,
+    ':empty_list': []
   };
+  params.UpdateExpression = 'SET #checkIns = list_append(:newCheckIn, if_not_exists(#checkIns, :empty_list))';
   // make sure task is not already checked in today
-  // params.ConditionExpression = '(#checkIns NULL) OR NOT (#checkIns[0] BEGINS_WITH :justDatePart)';
-  //
-  return Task.updateAsync(taskID, params).then(postProcessGetItem);
+  params.ConditionExpression = 'attribute_not_exists(#checkIns) OR (NOT begins_with(#checkIns[0], :justDatePart))';
+
+  return Task.updateAsync({taskID}, params).then(postProcessGetItem);
 }
 
 export function undoCheckIn({taskID}) {
@@ -152,12 +170,12 @@ export function undoCheckIn({taskID}) {
     '#checkIns': 'checkIns'
   };
   params.ExpressionAttributeValues = {
-    ':justDatePart': justDatePart
+    ':justDatePart': justDatePart,
   };
   // make sure task is not already checked in today
-  params.conditionExpression = '(#checkIns NOT NULL) AND (#checkIns[0] BEGINS_WITH :justDatePart)';
+  params.ConditionExpression = 'attribute_exists(#checkIns) AND (begins_with(#checkIns[0], :justDatePart))';
 
-  return Task.updateAsync(taskID, params).then(postProcessGetItem);
+  return Task.updateAsync({taskID}, params).then(postProcessGetItem);
 
 }
 
