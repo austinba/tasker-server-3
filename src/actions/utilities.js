@@ -4,7 +4,7 @@ export const exampleUser = 'austin@qs';
 
 
 export const postProcessGetItem =
-  R.prop('attrs');
+  R.pipe(R.defaultTo({}), R.prop('attrs'), R.defaultTo({}));
 
 
 export const postProcessGetItems =

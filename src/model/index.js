@@ -52,12 +52,12 @@ export const User = dynogels.define('qs-user', {
 });
 
 export const Team = dynogels.define('qs-team', {
-  hashKey:       'teamdomain',
-  timestamps:    true,
+  hashKey:         'teamdomain',
+  timestamps:      true,
   schema: {
-    teamdomain:  Joi.string().lowercase().alphanum().min(1).max(15),
-    teamName:    Joi.string().min(1).max(30).required(),
-    firstUserID: Joi.string().required()
+    teamdomain:    Joi.string().lowercase().alphanum().min(1).max(15),
+    teamName:      Joi.string().min(1).max(30).required(),
+    initialUserID: Joi.string().required()
   }
 });
 

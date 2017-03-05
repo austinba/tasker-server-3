@@ -26,7 +26,7 @@ const test1 = () =>
   ])
   .then(console.log).catch(console.log.bind(null, 'error'));
 
-test1();
+// test1();
 
 // test retrieval of all users
 const test12 = () =>
@@ -50,33 +50,33 @@ const test2 = () => {
   .then(t=>console.log('intermediate result', t) || t)
   .catch(t=>console.log('intermediate failure', t) || t)
   .then(userActions.deleteUser(fields))
-  .then(console.log).catch(console.log.bind(null, 'error'));
+  .then(console.log.bind(null, 'successful delete')).catch(console.log.bind(null, 'error'));
 }
 // test2();
 
 
-// create a token and then authenticate with that token
-// ensure password / hash are not present if resulting object
-const test3 = () => Promise.resolve(
-  userActions.encodeToken({
+// Try to login
+// Check: ensure password / hash are not present if resulting object
+const test13 = () => Promise.resolve(
+  userActions.login({
     password: 'the-best',
     teamdomain: 'qs',
     username: 'a1bman'
   }))
-  .then(userActions.authenticateUser)
+  .then(userActions.authenticate)
   .then(console.log).catch(console.log.bind(null, 'error'));
 
-// test3();
+test13();
 
 
 // create a token and then try to authenticate and fail with wrong pass
 const test4 = () => Promise.resolve(
-  userActions.encodeToken({
+  userActions.login({
     password: 'wrongpassword',
     teamdomain: 'qs',
     username: 'a1bman'
   }))
-  .then(userActions.authenticateUser)
+  .then(userActions.authenticate)
   .then(console.log).catch(console.log.bind(null, 'error'));
 
-// test4();
+test4();

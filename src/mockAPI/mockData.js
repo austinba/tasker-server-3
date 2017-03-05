@@ -133,8 +133,8 @@ export const users = [
 ];
 
 export const teams = [
-  {teamdomain: 'qs', teamName: 'Quarterstrech', firstUserID: 'austin'},
-  {teamdomain: 'slack', teamName: 'Slack', firstUserID: 'stewb'}
+  {teamdomain: 'qs', teamName: 'Quarterstrech', initialUserID: 'austin@qs'},
+  {teamdomain: 'slack', teamName: 'Slack', initialUserID: 'stew@qsb'}
 ]
 
 export const view = {

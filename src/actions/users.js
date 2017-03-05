@@ -20,8 +20,10 @@ const normalize =
     email:      email => normalizeEmail(email)
   });
 const keys = R.pick(['username', 'teamdomain']);
+const tokenFields = R.pick(['username', 'teamdomain', 'password']);
 const fields = R.pick(['username', 'teamdomain', 'email', 'firstName', 'lastName', 'password']);
 const keysNormalized = R.pipe(keys, normalize);
+const tokenFieldsNormalized = R.pipe(tokenFields, normalize);
 const fieldsNormalized = R.pipe(fields, normalize);
 const addUserID = user => R.assoc('userID', joinUserID(user), user);
 const dropPasswordAndHash = R.pipe(R.dissoc('passwordHash'), R.dissoc('password'));
@@ -81,10 +83,24 @@ export function checkUserPassword({password, ...fields}) {
     .then(comparePasswordToHash(password));
 }
 /** Authenticates a user from a JWT token and returns the user object */
-export function authenticateUser({jwtToken}) {
+export function login(fields) {
+  return checkUserPassword(fields)
+    .then(R.pipe(
+      R.unless(R.prop('isMatch'), R.always({})),
+      R.omit('isMatch'),
+      R.unless(
+        R.isEmpty,
+        R.always(encodeToken(tokenFieldsNormalized(fields)))
+    )))
+}
+/** Authenticates a user from a JWT token and returns the user object */
+export function authenticate({jwtToken}) {
   const fields = decodeToken(jwtToken);
   return checkUserPassword(fields)
-    .then(R.unless(R.prop('isMatch'), R.always({})))
+    .then(R.pipe(
+      R.unless(R.prop('isMatch'), R.always({})),
+      R.omit('isMatch')
+    ))
     .then(dropPasswordAndHash);
 }
 /** Creates a hash ("passwordHash") from the password field */
