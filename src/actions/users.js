@@ -10,10 +10,10 @@ const JWTSecret = Buffer.from(config.jwt.secret, 'hex');
 const normalize =
 R.evolve({
   username:   R.toLower,
-  teamDomain: R.toLower,
+  teamdomain: R.toLower,
   email:      R.apply(normalizeEmail)
 });
-const keys = R.pick(['username', 'teamDomain']);
+const keys = R.pick(['username', 'teamdomain']);
 const keysNormalized = R.pipe(keys, normalize);
 const addUserID = user => R.assoc('userID', joinUserID(user), user);
 const dropPasswordHash = R.dissoc('passwordHash');
@@ -30,16 +30,16 @@ export function getAllUsers() {
       t=>console.log(t) ||t
     )) // add the compound userID
 }
-/** username@teamDomain => {username, teamDomain}*/
+/** username@teamdomain => {username, teamdomain}*/
 export function splitUserID(userID) {
   const splitUserID = userID.split('@');
   if(splitUserID.length !== 2) return {};
-  return { username: splitUserID[0], teamDomain: splitUserID[1] };
+  return { username: splitUserID[0], teamdomain: splitUserID[1] };
 }
-/** {username, teamDomain} => username@teamDomain */
-export function joinUserID({username, teamDomain}) {
-  if(!username || !teamDomain) return '';
-  return username + '@' + teamDomain;
+/** {username, teamdomain} => username@teamdomain */
+export function joinUserID({username, teamdomain}) {
+  if(!username || !teamdomain) return '';
+  return username + '@' + teamdomain;
 }
 // this is going to go away -- but needed for mock data
 export function getUsersFromIDs(ids) {

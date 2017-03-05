@@ -86,9 +86,9 @@ export function createUserToken(fields) {
   return result
 }
 
-/** Gets the userID based on the username and teamDomain */
+/** Gets the userID based on the username and teamdomain */
 // export function getUserFromUsername(fields) {
-//   const requiredFields = ['username', 'teamDomain'];
+//   const requiredFields = ['username', 'teamdomain'];
 //   const result = Promise
 //     .resolve(fields)
 //     .then(rejectIfMissingFields(requiredFields))
@@ -97,7 +97,7 @@ export function createUserToken(fields) {
 //         User
 //           .scan()
 //           .where('username').equals(fields.username)
-//           .where('teamDomain').equals(fields.teamDomain)
+//           .where('teamdomain').equals(fields.teamdomain)
 //           .limit(1)
 //           .execAsync()
 //           .then();
@@ -112,7 +112,7 @@ export function createUserToken(fields) {
     adds a "passwordMatches" boolean to the returned fields.
 */
 export function checkUserPassword(fields) {
-  const requiredFields = ['username', 'teamDomain', 'password'];
+  const requiredFields = ['username', 'teamdomain', 'password'];
   const result = Promise.resolve(fields)
     .then(rejectIfMissingFields(requiredFields))
     .then(getUser)

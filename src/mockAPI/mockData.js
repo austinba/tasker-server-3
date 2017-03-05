@@ -126,10 +126,10 @@ export const checkIns = {
 }
 
 export const users = [
-  {username: 'austin', teamDomain: 'qs', email: 'austinba@gmail.com', passwordHash: 'samplehash', firstName: 'Austin',  lastName: 'Baltes'},
-  {username: 'jcheng', teamDomain: 'qs', email: 'jbhacker@aol.com', passwordHash: 'samplehash', firstName: 'Jiangbo', lastName: 'Cheng'},
-  {username: 'nick',   teamDomain: 'qs', email: 'cooldude@att.com', passwordHash: 'samplehash', firstName: 'Nick',    lastName: 'Carr'},
-  {username: 'chris',  teamDomain: 'qs', email: 'neversleep@gmail.com', passwordHash: 'samplehash', firstName: 'Chris',   lastName: 'Niel'}
+  {username: 'austin', teamdomain: 'qs', email: 'austinba@gmail.com', passwordHash: 'samplehash', firstName: 'Austin',  lastName: 'Baltes'},
+  {username: 'jcheng', teamdomain: 'qs', email: 'jbhacker@aol.com', passwordHash: 'samplehash', firstName: 'Jiangbo', lastName: 'Cheng'},
+  {username: 'nick',   teamdomain: 'qs', email: 'cooldude@att.com', passwordHash: 'samplehash', firstName: 'Nick',    lastName: 'Carr'},
+  {username: 'chris',  teamdomain: 'qs', email: 'neversleep@gmail.com', passwordHash: 'samplehash', firstName: 'Chris',   lastName: 'Niel'}
 ];
 
 export const view = {

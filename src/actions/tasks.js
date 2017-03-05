@@ -83,6 +83,7 @@ export function addTask(taskDetails) {
 }
 
 export function editTask({taskID, taskDetails}) {
+
   // Check if actually adding a task
   if(taskID === 'adding-task') {
     return addTask(taskDetails);
@@ -139,7 +140,7 @@ export function saveComment({taskID, comment}) {
     ':empty_list': [],
     ':comment': [commentObj]
   };
-  return Task.updateAsync({taskID}, params).then(postProcessGetItem).catch(console.log);
+  return Task.updateAsync({taskID}, params).then(postProcessGetItem);
 }
 
 export function checkIn({taskID}) {
@@ -198,17 +199,17 @@ export function undoCheckIn({taskID}) {
 }
 
 export function markComplete({taskID}) {
-  return updateTask({taskID}, {completionDate: new Date().toJSON()});
+  return editTask({taskID, taskDetails: {completionDate: new Date().toJSON()}});
 }
 
 export function markDeleted({taskID}) {
-  return updateTask({taskID}, {deleteDate: new Date().toJSON()});
+  return editTask({taskID, taskDetails: {deleteDate: new Date().toJSON()}});
 }
 
 export function unmarkComplete({taskID}) {
-  return updateTask({taskID}, {completionDate: null});
+  return editTask({taskID, taskDetails: {completionDate: null}});
 }
 
 export function unmarkDeleted({taskID}) {
-  return updateTask({taskID}, {deleteDate: null});
+  return editTask({taskID, taskDetails: {deleteDate: null}});
 }

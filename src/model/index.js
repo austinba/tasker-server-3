@@ -22,6 +22,7 @@ export const Task = dynogels.define('qs-task', {
     description:    Joi.string(),
     dueDate:        Joi.string().isoDate(),
     completionDate: Joi.string().isoDate(),
+    deleteDate:     Joi.string().isoDate(),
     assignedFrom:   Joi.string(),
     assignedTo:     Joi.string(),
     level:          Joi.number(),
@@ -37,11 +38,11 @@ export const Task = dynogels.define('qs-task', {
 });
 
 export const User = dynogels.define('qs-user', {
-  hashKey:        'teamDomain',
+  hashKey:        'teamdomain',
   rangeKey:       'username',
   timestamps:     true,
   schema: {
-    teamDomain:   Joi.string().lowercase().alphanum().min(1).max(15),
+    teamdomain:   Joi.string().lowercase().alphanum().min(1).max(15),
     username:     Joi.string().lowercase().alphanum().min(1).max(15),
     email:        Joi.string().email().required(),
     passwordHash: Joi.string().required(),
@@ -51,10 +52,10 @@ export const User = dynogels.define('qs-user', {
 });
 
 export const Team = dynogels.define('qs-team', {
-  hashKey:       'teamDomain',
+  hashKey:       'teamdomain',
   timestamps:    true,
   schema: {
-    teamDomain:  Joi.string().lowercase().alphanum().min(1).max(15),
+    teamdomain:  Joi.string().lowercase().alphanum().min(1).max(15),
     teamName:    Joi.string().min(1).max(30).required(),
     firstUserID: Joi.string().required()
   }
@@ -66,7 +67,7 @@ export const Invite = dynogels.define('qs-invite', {
   timestamps:    true,
   schema: {
     inviteID:    dynogels.types.uuid(),
-    teamDomain:  Joi.string().lowercase().alphanum().min(1).max(15),
+    teamdomain:  Joi.string().lowercase().alphanum().min(1).max(15),
     toEmail:     Joi.string().lowercase().email(),
     fromUserID:  Joi.string().lowercase().alphanum().min(1).max(15)
   }
