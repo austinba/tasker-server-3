@@ -1,13 +1,12 @@
 import R from 'ramda';
-import { User } from '../model';
 import Promise from 'bluebird';
+import { postProcessScan, postProcessGetItems } from './utilities';
+import { User } from '../model';
 
 export function getAllUsers() {
-  return User.scan().execAsync().then(R.pipe(
-    R.prop('Items'),
-    R.map(R.prop('attrs'))
-  ));
+  return User.scan().execAsync().then(postProcessScan);
 }
 export function getUsersFromIDs(ids) {
-  return User.getItemsAsync(ids).then(R.map(R.prop('attrs')));
+  return User.getItemsAsync(ids).then(postProcessGetItems);
 }
+export const getUsers = getUsersFromIDs; // alias

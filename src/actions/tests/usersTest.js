@@ -1,3 +1,4 @@
+const currentUser = '00000000-0000-0000-0000-000000000101';
 process.env.NODE_ENV = 'dev';
 
 // 'import' hoists so use 'require' so we can set NODE_ENV first.
