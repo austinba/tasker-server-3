@@ -3,7 +3,7 @@ import Promise from 'bluebird';
 import bcrypt from 'bcryptjs'
 import normalizeEmail from 'normalize-email';
 import jwt from 'jwt-simple';
-import { postProcessScan, postProcessGetItems, postProcessGetItem } from './utilities';
+import { postProcessScan, postProcessGetItem } from './utilities';
 import { User } from '../model';
 import config from '../app_config.json';
 const JWTSecret = Buffer.from(config.jwt.secret, 'hex');
@@ -13,7 +13,6 @@ const JWTSecret = Buffer.from(config.jwt.secret, 'hex');
 // We don't want this to show up in a user response
 //
 
-/** Replaces User fields with normalized versions of the same parameters */
 const normalize =
   R.evolve({
     username:   R.toLower,
@@ -34,10 +33,11 @@ export function getAllUsers() {
       postProcessScan,
       R.map(R.pipe(
         addUserID,
-        dropPasswordHash
+        dropPasswordAndHash
       ))
     )) // add the compound userID
 }
+
 /** username@teamdomain => {username, teamdomain}*/
 export function splitUserID(userID) {
   const splitUserID = userID.split('@');
@@ -49,10 +49,13 @@ export function joinUserID({username, teamdomain}) {
   if(!username || !teamdomain) return '';
   return username + '@' + teamdomain;
 }
-// this is going to go away -- but needed for mock data
-export function getUserAndPasssFromIDs(ids) {
-  return User.getItemsAsync(R.map(splitUserID)(ids))
-    .then(postProcessGetItems);
+export function getUsersFromIDs(ids) {
+  const userKeys = R.map(splitUserID, ids);
+  return User.getItemsAsync(userKeys)
+    .then(R.map(R.pipe(
+      postProcessGetItem,
+      dropPasswordAndHash
+    )));
 }
 export function addUser(fields) {
   return hashPassword(fieldsNormalized(fields))
@@ -71,7 +74,7 @@ export function getUser(fields) {
   return getUserAndPass(fields).then(dropPasswordAndHash);
 }
 export function deleteUser(fields) {
-  return User.destroyAsync(keysNormalized(fields))
+  return User.destroyAsync(keysNormalized(fields));
 }
 export function checkUserPassword({password, ...fields}) {
   return getUserAndPass(keysNormalized(fields))

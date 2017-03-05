@@ -4,16 +4,36 @@ process.env.NODE_ENV = 'dev';
 const userActions = require('../users');
 
 
-// test retrieval of users
-const test1 = () => Promise.all([
-  userActions.getAllUsers(),
+// test retrieval of single user
+const test10 = () =>
+  userActions.getUser({username: 'austin', teamdomain: 'qs'})
+    .then(console.log).catch(console.log.bind(null, 'error'));
+
+// test10();
+
+// test retrieval of non-existant user (should return empty object)
+const test11 = () =>
+  userActions.getUser({username: 'austin', teamdomain: 'notateam'})
+    .then(console.log).catch(console.log.bind(null, 'error'));
+
+// test11();
+
+// test retrieval of multiple users
+const test1 = () =>
   userActions.getUsersFromIDs([
     'austin@qs',
     'chris@qs'
   ])
-]).then(console.log).catch(console.log.bind(null, 'error'));
+  .then(console.log).catch(console.log.bind(null, 'error'));
 
-// test1();
+test1();
+
+// test retrieval of all users
+const test12 = () =>
+  userActions.getAllUsers()
+  .then(console.log).catch(console.log.bind(null, 'error'));
+
+// test12();
 
 
 // can create then delete a user
