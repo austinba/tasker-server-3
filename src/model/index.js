@@ -22,14 +22,13 @@ export const Task = dynogels.define('qs-task', {
     description:    Joi.string(),
     dueDate:        Joi.string().isoDate(),
     completionDate: Joi.string().isoDate(),
-    assignedFrom:   Joi.string().guid(),
-    assignedTo:     Joi.string().guid(),
+    assignedFrom:   Joi.string(),
+    assignedTo:     Joi.string(),
     level:          Joi.number(),
     checkIns:       Joi.array().items(Joi.string().isoDate()),
     comments:       Joi.array().items(
       Joi.object().keys({
-        commentID: Joi.string().guid(),
-        from: Joi.string().guid(),
+        from: Joi.string(),
         date: Joi.string().isoDate(),
         comment: Joi.string()
       })
@@ -38,44 +37,52 @@ export const Task = dynogels.define('qs-task', {
 });
 
 export const User = dynogels.define('qs-user', {
-  hashKey:        'userID',
+  hashKey:        'teamDomain',
+  rangeKey:       'username',
   timestamps:     true,
   schema: {
-    userID:       dynogels.types.uuid(),
-    firstName:    Joi.string().min(1).max(30),
+    teamDomain:   Joi.string().lowercase().alphanum().min(1).max(15),
+    username:     Joi.string().lowercase().alphanum().min(1).max(15),
+    email:        Joi.string().email().required(),
+    passwordHash: Joi.string().required(),
+    firstName:    Joi.string().min(1).max(30).required(),
     lastName:     Joi.string().min(1).max(30)
   }
 });
+
+export const Team = dynogels.define('Team', {
+  hashKey:       'teamDomain',
+  timestamps:    true,
+  schema: {
+    teamDomain:  Joi.string().lowercase().alphanum().min(1).max(15),
+    teamName:    Joi.string().min(1).max(30).required(),
+    firstUserID: Joi.string().required()
+  }
+})
+
 //
 // export const User = dynogels.define('qs-user', {
 //   hashKey:        'userID',
+//   rangeKey:       'teamID',
 //   timestamps:     true,
 //   schema: {
-//     userID:       dynogels.types.uuid(),
-//     username:     Joi.string().lowercase().alphanum().min(1).max(15),
-//     teamDomain:   Joi.string().lowercase().alphanum().min(1).max(15),
+//     userID:       Joi.string().lowercase().alphanum().min(1).max(15),
+//     teamID:       Joi.string().lowercase().alphanum().min(1).max(15),
 //     email:        Joi.string().email(),
 //     passwordHash: Joi.string(),
 //     firstName:    Joi.string().min(1).max(30),
 //     lastName:     Joi.string().min(1).max(30),
 //   }
 // });
-//
-// export const Team = dynogels.define('qs-team', {
-//   hashKey:       'teamDomain',
-//   timestamps:    true,
-//   schema: {
-//     teamDomain:  Joi.string().lowercase().alphanum().min(1).max(15),
-//     teamName:    Joi.string().min(1).max(30)
-//   }
-// })
-//
-// export const Invite = dynogels.define('qs-invite', {
-//   hashKey:       'inviteID',
-//   timestamps:    true,
-//   schema: {
-//     inviteID:    dynogels.types.uuid(),
-//     toEmail:     Joi.string().email(),
-//     fromUserID:  Joi.string().lowercase().alphanum().min(1).max(15)
-//   }
-// });
+
+
+export const Invite = dynogels.define('Invite', {
+  hashKey:       'inviteID',
+  timestamps:    true,
+  schema: {
+    inviteID:    dynogels.types.uuid(),
+    teamDomain:  Joi.string().lowercase().alphanum().min(1).max(15),
+    toEmail:     Joi.string().lowercase().email(),
+    fromUserID:  Joi.string().lowercase().alphanum().min(1).max(15)
+  }
+});
