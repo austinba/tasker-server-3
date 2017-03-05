@@ -3,6 +3,7 @@ import tasksRouter from './routes/tasks';
 import usersRouter from './routes/users';
 import mockAPIRouter from './mockAPI/routes';
 import loginRouter from './routes/login';
+import { auth } from './auth';
 import cors from 'cors';
 import bodyParser from 'body-parser';
 import express from 'express';
@@ -24,6 +25,9 @@ app.use('/tasks', tasksRouter);
 app.use('/users', usersRouter);
 app.use('/mockapi', mockAPIRouter);
 app.use('/login', loginRouter);
+app.get('/authtest', auth, function(req, res) {
+  res.send('you\'re authenticated!!!')
+});
 
 app.set('port', process.env.PORT || 4000);
 app.listen(app.get('port'), function() {

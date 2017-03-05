@@ -1,4 +1,4 @@
-import userActions from './actions/users';
+import * as userActions from './actions/users';
 
 
 /** This only checks if user is authenticated, but doesn't block unauthenticated requests */

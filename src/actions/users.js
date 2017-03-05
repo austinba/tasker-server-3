@@ -115,8 +115,10 @@ export function login(fields) {
       R.omit('isMatch'),
       R.unless(
         R.isEmpty,
-        R.always(encodeToken(tokenFieldsNormalized(fields)))
-    )))
+        R.merge(encodeToken(tokenFieldsNormalized(fields)))
+      ),
+      dropPasswordAndHash
+    ))
 }
 /** Authenticates a user from a JWT token and returns the user object */
 export function authenticate({jwtToken}) {
