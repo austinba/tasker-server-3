@@ -1,4 +1,3 @@
-const currentUser = '00000000-0000-0000-0000-000000000101';
 process.env.NODE_ENV = 'dev';
 
 // 'import' hoists so use 'require' so we can set NODE_ENV first.
@@ -18,21 +17,26 @@ const test1 = () => Promise.all([
 
 
 // can create then delete a user
-const test2 = () =>
-  userActions.addUser({
+// ensure password / hash are not present if intermediate object
+const test2 = () => {
+  const fields = {
     firstName: 'austin',
     lastName: 'baltes',
     password: 'the-best',
     teamdomain: 'qs',
     username: 'a1bman',
-    email: 'aus@ba.com'})
-  .then(fields => userActions.deleteUser(fields))
+    email: 'aus@ba.com'};
+  userActions.addUser(fields )
+  .then(t=>console.log('intermediate result', t) || t)
+  .catch(t=>console.log('intermediate failure', t) || t)
+  .then(userActions.deleteUser(fields))
   .then(console.log).catch(console.log.bind(null, 'error'));
-
+}
 // test2();
 
 
 // create a token and then authenticate with that token
+// ensure password / hash are not present if resulting object
 const test3 = () => Promise.resolve(
   userActions.encodeToken({
     password: 'the-best',
@@ -55,4 +59,4 @@ const test4 = () => Promise.resolve(
   .then(userActions.authenticateUser)
   .then(console.log).catch(console.log.bind(null, 'error'));
 
-test4();
+// test4();

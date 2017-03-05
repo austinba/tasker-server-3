@@ -81,7 +81,8 @@ export function checkUserPassword({password, ...fields}) {
 export function authenticateUser({jwtToken}) {
   const fields = decodeToken(jwtToken);
   return checkUserPassword(fields)
-    .then(R.unless(R.prop('isMatch'), R.always({})));
+    .then(R.unless(R.prop('isMatch'), R.always({})))
+    .then(dropPasswordAndHash);
 }
 /** Creates a hash ("passwordHash") from the password field */
 function hashPassword(fields) {
