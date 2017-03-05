@@ -35,6 +35,14 @@ const test12 = () =>
 
 // test12();
 
+// test retrieval of all users on a a team
+const test14 = () => {
+  userActions.getAllUsersOnTeam({teamdomain: 'qs'})
+    .then(console.log.bind(null, 'result'))
+    .catch(console.log.bind(null, 'error'));
+}
+
+test14();
 
 // can create then delete a user
 // ensure password / hash are not present if intermediate object
@@ -50,7 +58,8 @@ const test2 = () => {
   .then(t=>console.log('intermediate result', t) || t)
   .catch(t=>console.log('intermediate failure', t) || t)
   .then(userActions.deleteUser(fields))
-  .then(console.log.bind(null, 'successful delete')).catch(console.log.bind(null, 'error'));
+  .then(console.log.bind(null, 'successful delete'))
+  .catch(console.log.bind(null, 'error'));
 }
 // test2();
 
@@ -66,7 +75,7 @@ const test13 = () => Promise.resolve(
   .then(userActions.authenticate)
   .then(console.log).catch(console.log.bind(null, 'error'));
 
-test13();
+// test13();
 
 
 // create a token and then try to authenticate and fail with wrong pass
@@ -79,4 +88,4 @@ const test4 = () => Promise.resolve(
   .then(userActions.authenticate)
   .then(console.log).catch(console.log.bind(null, 'error'));
 
-test4();
+// test4();

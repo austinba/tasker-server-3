@@ -40,6 +40,21 @@ export function getAllUsers() {
     )) // add the compound userID
 }
 
+export function getAllUsersOnTeam(fields) {
+  const teamdomain = keysNormalized(fields).teamdomain
+  return (User.query(teamdomain)
+    .loadAll()
+    .execAsync()
+    .tap(t => console.log('loaded all') || t)
+    .then(R.pipe(
+      postProcessScan,
+      R.map(R.pipe(
+        addUserID,
+        dropPasswordAndHash
+      ))
+    )) // add the compound userID
+  );
+}
 /** username@teamdomain => {username, teamdomain}*/
 export function splitUserID(userID) {
   const splitUserID = userID.split('@');
