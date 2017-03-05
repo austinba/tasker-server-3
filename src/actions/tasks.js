@@ -163,12 +163,13 @@ export function checkIn({taskID}) {
   return (
     Task
       .updateAsync({taskID}, params)
-      .then(postProcessGetItem)
-      .then(t => console.log(t) || t)
-      .then(postProcessTask)
-      .then(R.prop('lastCheckInDate'))
-    );
-
+      .then(
+        R.pipe(
+          postProcessGetItem,
+          postProcessTask,
+          R.prop('lastCheckInDate'),
+          R.objOf('date')
+        )));
 }
 
 export function undoCheckIn({taskID}) {
@@ -188,12 +189,13 @@ export function undoCheckIn({taskID}) {
   return (
     Task
       .updateAsync({taskID}, params)
-      .then(postProcessGetItem)
-      .then(t => console.log(t) || t)
-      .then(postProcessTask)
-      .then(R.prop('lastCheckInDate'))
-    );
-
+      .then(
+        R.pipe(
+          postProcessGetItem,
+          postProcessTask,
+          R.prop('lastCheckInDate'),
+          R.objOf('date')
+        )));
 }
 
 export function markComplete({taskID}) {
