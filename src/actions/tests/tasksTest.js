@@ -17,13 +17,13 @@ const newTask =
 // tests getTasksIveAssigned and getMyTasks
 const test1 = () =>
   Promise.all([
-    actions.getTasksIveAssigned(),
+    // actions.getTasksIveAssigned(),
     actions.getMyTasks(),
   ])
   .then(console.log)
   .catch(console.log.bind(null, 'error'));
 
-// test1();
+test1();
 
 // edit a task
 const test2 = () =>

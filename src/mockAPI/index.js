@@ -11,37 +11,13 @@ const getTaskIndex = (taskID) => R.findIndex(R.propEq('taskID', taskID))(tasks);
 // });
 
 export function checkIn({taskID}) {
-  const now = new Date();
-  const taskCheckIns = checkIns[taskID];
-  if(!taskCheckIns) {
-    checkIns[taskID] = [now];
-    return Promise.resolve(now);
-  }
-  const mostRecent = taskCheckIns[0];
-  const mostRecentDateString = new Date(mostRecent || 0).toJSON().split('T')[0];
-  const nowDateString = now.toJSON().split('T')[0];
-  if(nowDateString === mostRecentDateString) {
-    delete taskCheckIns[0];
-  }
-  taskCheckIns.unshift(now);
-  return Promise.resolve({date: now});
+  return taskActions.checkIn({taskID}
+  ).then(R.pipe(R.prop('checkIns'), R.head))
 }
 
 export function cancelCheckIn({taskID}) {
-  const now = new Date();
-  const taskCheckIns = checkIns[taskID];
-  if(!taskCheckIns) {
-    checkIns[taskID] = [now];
-    return Promise.resolve(0);
-  }
-  const mostRecent = taskCheckIns[0];
-  const mostRecentDateString = new Date(mostRecent || 0).toJSON().split('T')[0];
-  const nowDateString = now.toJSON().split('T')[0];
-  if(nowDateString === mostRecentDateString) {
-    delete taskCheckIns[0];
-  }
-  return Promise.resolve({date: taskCheckIns[0] || 0});
-
+  return taskActions.undoCheckIn({taskID}
+  ).then(R.pipe(R.prop('checkIns'), R.head))
 }
 
 export function getMyTasks() {
@@ -54,18 +30,9 @@ export function editTask({taskID, taskDetails}) {
   return taskActions.editTask({taskID, taskDetails});
 }
 export function saveComment({taskID, comment}) {
-  const taskIndex = R.findIndex(R.propEq('taskID', taskID))(tasks);
-  if(!taskIndex === -1) {
-    return Promise.reject()
-  };
-  const newComment = {
-    commentID: Math.floor(Math.random() * 100000),
-    from: user,
-    date: Date.now(),
-    comment
-  }
-  tasks[taskIndex].comments.push(newComment);
-  return Promise.resolve(R.clone(newComment));
+  return taskActions.saveComment({taskID, comment}).then(
+    R.pipe(R.prop('comments'), R.head)
+  )
 }
 export function getUsers() {
   return userActions.getAllUsers().then(R.indexBy(R.prop('userID')));

@@ -12,7 +12,7 @@ const getRecentUserIDs =
     R.filter(task => task.assignedTo === exampleUser),
     R.map(task => [ task.assignedTo,
                     task.assignedFrom,
-                    R.map(comment => comment.from)(task.comments)]),
+                    R.map(comment => comment.from)(task.comments || [])]),
     R.flatten,
     R.reject(R.isNil),
     R.dropRepeats
@@ -29,7 +29,7 @@ export function getMyTasks() {
           R.map(R.evolve({ comments: R.sortWith([R.descend(R.prop('date'))]) })),
           R.indexBy(R.prop('taskID'))
         )(tasks),
-        users: getRecentUserIDs(tasks)
+         users: getRecentUserIDs(tasks)
     }));
 }
 
@@ -108,14 +108,73 @@ export function editTask({taskID, taskDetails}) {
 }
 export function saveComment({taskID, comment}) {
   const params = {};
-  params.UpdateExpression = '#comments = list_append(:comment, #comments)';
+  const commentObj = {
+    from: exampleUser,
+    date: new Date().toJSON(),
+    comment
+  }
+  params.UpdateExpression =
+    'SET #comments = list_append (:comment, if_not_exists(#comments, :empty_list))';
   params.ExpressionAttributeNames = {
     '#comments': 'comments'
   };
   params.ExpressionAttributeValues = {
-    ':comment': comment
+    ':empty_list': [],
+    ':comment': [commentObj]
   };
+  return Task.updateAsync({taskID}, params).then(postProcessGetItem).catch(console.log);
+}
+
+export function checkIn({taskID}) {
+  const params = {};
+  const newDateString = new Date().toJSON();
+  const justDatePart = newDateString.split('T')[0];
+  params.UpdateExpression = '#checkIns = list_append(:newCheckIn, #checkIns)';
+  params.ExpressionAttributeNames = {
+    '#checkIns': 'checkIns'
+  };
+  params.ExpressionAttributeValues = {
+    ':newCheckIn': newDateString,
+    ':justDatePart': justDatePart
+  };
+  // make sure task is not already checked in today
+  // params.ConditionExpression = '(#checkIns NULL) OR NOT (#checkIns[0] BEGINS_WITH :justDatePart)';
+  //
   return Task.updateAsync(taskID, params).then(postProcessGetItem);
+}
+
+export function undoCheckIn({taskID}) {
+  const params = {};
+  const newDateString = new Date().toJSON();
+  const justDatePart = newDateString.split('T')[0];
+  params.UpdateExpression = '#checkIns = REMOVE #checkIns[0]';
+  params.ExpressionAttributeNames = {
+    '#checkIns': 'checkIns'
+  };
+  params.ExpressionAttributeValues = {
+    ':justDatePart': justDatePart
+  };
+  // make sure task is not already checked in today
+  params.conditionExpression = '(#checkIns NOT NULL) AND (#checkIns[0] BEGINS_WITH :justDatePart)';
+
+  return Task.updateAsync(taskID, params).then(postProcessGetItem);
+
+}
+
+export function markComplete({taskID}) {
+  return updateTask({taskID}, {completionDate: new Date().toJSON()});
+}
+
+export function markDeleted({taskID}) {
+  return updateTask({taskID}, {deleteDate: new Date().toJSON()});
+}
+
+export function unmarkComplete({taskID}) {
+  return updateTask({taskID}, {completionDate: null});
+}
+
+export function unmarkDeleted({taskID}) {
+  return updateTask({taskID}, {deleteDate: null});
 }
 
 

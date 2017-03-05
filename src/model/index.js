@@ -25,6 +25,7 @@ export const Task = dynogels.define('qs-task', {
     assignedFrom:   Joi.string().guid(),
     assignedTo:     Joi.string().guid(),
     level:          Joi.number(),
+    checkIns:       Joi.array().items(Joi.string().isoDate()),
     comments:       Joi.array().items(
       Joi.object().keys({
         commentID: Joi.string().guid(),

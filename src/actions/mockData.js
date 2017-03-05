@@ -1,7 +1,7 @@
 import * as mockData from '../mockAPI/mockData';
 import R from 'ramda';
 import Promise from 'bluebird';
-import Models from '../model';
+import * as Models from '../model';
 
 export const loadMockDataFrom = (model, data) => {
   const stringifiedDates = R.pipe(JSON.stringify, JSON.parse)(data);
