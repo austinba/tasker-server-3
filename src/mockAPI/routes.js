@@ -1,15 +1,22 @@
 import * as api from './index';
+import R from 'ramda';
+import Promise from 'bluebird';
 import express from 'express';
-const router = express.Router();
-
-const routeHandler = (apiFn) => (req, res) => {
+const routeReporter = (req, res, next) => {
   console.log(req.path);
   console.log(req.body);
   console.log('');
+  next();
+}
+
+const router = express.Router();
+router.use(routeReporter);
+
+const routeHandler = (apiFn) => (req, res) => {
   apiFn(req.body)
     .then(data => typeof data !== 'object' ? {data} : data)
     .then(data => res.send(data))
-    .catch(err => res.sendStatus(500));
+    .catch(err => console.log(err) || res.sendStatus(500));
 }
 
 router.post('/checkin', routeHandler(api.checkIn));

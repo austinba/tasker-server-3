@@ -2,15 +2,35 @@ import { exampleUser } from './utilities';
 import R from 'ramda';
 import { postProcessScan, postProcessGetItem, postProcessGetItems } from './utilities';
 import { Task } from '../model';
+import * as userActions from './users';
 
 // TODO: ensure any task modified is associated with the user
 // TODO: ensure any task viewed is associated with the user's team
+
+const getRecentUserIDs =
+  R.pipe(
+    R.filter(task => task.assignedTo === exampleUser),
+    R.map(task => [ task.assignedTo,
+                    task.assignedFrom,
+                    R.map(comment => comment.from)(task.comments)]),
+    R.flatten,
+    R.reject(R.isNil),
+    R.dropRepeats
+  );
 
 export function getMyTasks() {
   return Task
     .scan()
     .where('assignedTo').equals(exampleUser)
-    .execAsync().then(postProcessScan);
+    .execAsync().then(postProcessScan)
+    .then(
+      tasks => ({
+        tasks: R.pipe( // sort comments and index tasks
+          R.map(R.evolve({ comments: R.sortWith([R.descend(R.prop('date'))]) })),
+          R.indexBy(R.prop('taskID'))
+        )(tasks),
+        users: getRecentUserIDs(tasks)
+    }));
 }
 
 export function getTasksIveAssigned() {
@@ -68,14 +88,17 @@ export function editTask({taskID, taskDetails}) {
     updateConditions.expected['assignedTo'] = { '<>': exampleUser };
   }
 
-  // Don't allow non-association to result from saving
-  if(assignedTo  && assignedTo  !== exampleUser) {
-    updateConditions.expected['assignedFrom'] = { E: exampleUser };
+  // if something is being assigned
+  if(assignedTo || assignedFrom) {
+    // and the other isn't assigned to the current user,
+    // make sure the current user is already assigned to the other
+    if(!assignedTo && (assignedFrom !== exampleUser)) {
+      updateConditions.expected['assignedTo'] = { E: exampleUser };
+    }
+    if(!assignedFrom && (assignedTo !== exampleUser)) {
+      updateConditions.expected['assignedFrom'] = { E: exampleUser };
+    }
   }
-  if(assignedFrom && assignedFrom !== exampleUser) {
-    updateConditions.expected['assignedFrom'] = { E: exampleUser };
-  }
-  console.log(updateConditions);
 
   // If editing, taskID should not be modified (could lead to vulnerabilities and bugs)
   delete taskDetails['taskID'];
