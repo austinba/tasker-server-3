@@ -50,7 +50,7 @@ export const User = dynogels.define('qs-user', {
   }
 });
 
-export const Team = dynogels.define('Team', {
+export const Team = dynogels.define('qs-team', {
   hashKey:       'teamDomain',
   timestamps:    true,
   schema: {
@@ -58,25 +58,10 @@ export const Team = dynogels.define('Team', {
     teamName:    Joi.string().min(1).max(30).required(),
     firstUserID: Joi.string().required()
   }
-})
-
-//
-// export const User = dynogels.define('qs-user', {
-//   hashKey:        'userID',
-//   rangeKey:       'teamID',
-//   timestamps:     true,
-//   schema: {
-//     userID:       Joi.string().lowercase().alphanum().min(1).max(15),
-//     teamID:       Joi.string().lowercase().alphanum().min(1).max(15),
-//     email:        Joi.string().email(),
-//     passwordHash: Joi.string(),
-//     firstName:    Joi.string().min(1).max(30),
-//     lastName:     Joi.string().min(1).max(30),
-//   }
-// });
+});
 
 
-export const Invite = dynogels.define('Invite', {
+export const Invite = dynogels.define('qs-invite', {
   hashKey:       'inviteID',
   timestamps:    true,
   schema: {

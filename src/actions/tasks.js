@@ -2,7 +2,6 @@ import { exampleUser } from './utilities';
 import R from 'ramda';
 import { postProcessScan, postProcessGetItem, postProcessGetItems } from './utilities';
 import { Task } from '../model';
-import * as userActions from './users';
 
 // TODO: ensure any task modified is associated with the user
 // TODO: ensure any task viewed is associated with the user's team

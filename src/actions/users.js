@@ -13,41 +13,60 @@ R.evolve({
   teamDomain: R.toLower,
   email:      R.apply(normalizeEmail)
 });
+const keys = R.pick(['username', 'teamDomain']);
+const keysNormalized = R.pipe(keys, normalize);
+const addUserID = user => R.assoc('userID', joinUserID(user), user);
+const dropPasswordHash = R.dissoc('passwordHash');
 
-const keys = R.pick('username', 'teamDomain');
-const keysNormalized = R.pipe(keys, normalizeUserAttrs);
 
-/** Create a User */
-export function add(fields) {
+export function getAllUsers() {
+  return User.scan().execAsync()
+    .then(R.pipe(
+      postProcessScan,
+      R.map(R.pipe(
+        addUserID,
+        dropPasswordHash
+      )),
+      t=>console.log(t) ||t
+    )) // add the compound userID
+}
+/** username@teamDomain => {username, teamDomain}*/
+export function splitUserID(userID) {
+  const splitUserID = userID.split('@');
+  if(splitUserID.length !== 2) return {};
+  return { username: splitUserID[0], teamDomain: splitUserID[1] };
+}
+/** {username, teamDomain} => username@teamDomain */
+export function joinUserID({username, teamDomain}) {
+  if(!username || !teamDomain) return '';
+  return username + '@' + teamDomain;
+}
+// this is going to go away -- but needed for mock data
+export function getUsersFromIDs(ids) {
+  return User.getItemsAsync(ids).then(postProcessGetItems);
+}
+export function addUser(fields) {
   return hashPassword(normalize(fields))
     .then(fields => User.createAsync(fields, { overwrite: false }))
     .then(postProcessGetItem);
 }
-
-/** Get a user */
-export function fetch(fields) {
+export function getUser(fields) {
   return User.getItemAsync(keysNormalized(fields))
     .then(postProcessGetItem);
 }
-
-/** Delete a User */
 export function deleteUser(fields) {
   return User.destoryAsync(keysNormalized(fields))
     .then(postProcessGetItem);
 }
-
+export function checkUserPassword({password, ...fields}) {
+  return getUser(keysNormalized(fields))
+  .then(comparePasswordToHash(password)); // returns error if fails
+}
 /** Authenticates a user from a JWT token and returns the user object */
 export function authenticateUser(token) {
   const fields = decodeToken(token);
   return getUser(fields)
 }
-
-/** Checks whether a password is correct */
-export function checkUserPassword({password, ...fields}) {
-  return getUser(keysNormalized(fields))
-    .then(comparePasswordToHash(password)); // returns error if fails
-}
-
 /** Creates a hash ("passwordHash") from the password field */
 function hashPassword(fields) {
   const result = Promise.resolve(bcrypt.genSalt(10))
@@ -55,17 +74,14 @@ function hashPassword(fields) {
     .then(passwordHash => ({ ...fields, passwordHash }))
   return result;
 }
-
 /** Returns a function that compares fields.passwordHash to the password provided */
 function comparePasswordToHash(password) {
-  return (fields) => bcrypt.compare(password, fields.passwordHash));
+  return (fields) => bcrypt.compare(password, fields.passwordHash);
 }
-
 /** Encodes a JWT token embedded the supplied fields */
 export function encodeToken(fields) {
   return 'JWT ' + jwt.encode(JWTSecret);
 }
-
 /** Decodes the "jwtToken" field into the contained attributes
     Token is in the format "JWT [token-string]" */
 function decodeToken(fields) {
@@ -74,14 +90,6 @@ function decodeToken(fields) {
     if(tokenParts.length !== 2) throw Error('Invalid Token');
     return jwt.decode(tokenParts[1], JWTSecret);
   } catch (error) {
-    console.log('failed to decode token:', error);
     return {};
   }
-}
-
-export function getAllUsers() {
-  return User.scan().execAsync().then(postProcessScan);
-}
-export function getUsersFromIDs(ids) {
-  return User.getItemsAsync(ids).then(postProcessGetItems);
 }

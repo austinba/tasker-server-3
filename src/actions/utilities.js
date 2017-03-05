@@ -1,6 +1,6 @@
 import R from 'ramda';
 
-export const exampleUser = '00000000-0000-0000-0000-000000000101';
+export const exampleUser = 'austin@qs';
 
 
 export const postProcessGetItem =
