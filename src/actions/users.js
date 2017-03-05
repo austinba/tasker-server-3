@@ -2,6 +2,7 @@ import R from 'ramda';
 import Promise from 'bluebird';
 import bcrypt from 'bcryptjs'
 import normalizeEmail from 'normalize-email';
+import jwt from 'jwt-simple';
 import { postProcessScan, postProcessGetItems, postProcessGetItem } from './utilities';
 import { User } from '../model';
 import config from '../app_config.json';
@@ -49,7 +50,7 @@ export function joinUserID({username, teamdomain}) {
   return username + '@' + teamdomain;
 }
 // this is going to go away -- but needed for mock data
-export function getUsersFromIDs(ids) {
+export function getUserAndPasssFromIDs(ids) {
   return User.getItemsAsync(R.map(splitUserID)(ids))
     .then(postProcessGetItems);
 }
@@ -62,22 +63,25 @@ export function addUser(fields) {
         dropPasswordAndHash
       ));
 }
-export function getUser(fields) {
-  return User.getItemAsync(keysNormalized(fields))
+export function getUserAndPass(fields) {
+  return User.getAsync(keysNormalized(fields))
     .then(postProcessGetItem);
+}
+export function getUser(fields) {
+  return getUserAndPass(fields).then(dropPasswordAndHash);
 }
 export function deleteUser(fields) {
-  return User.destoryAsync(keysNormalized(fields))
-    .then(postProcessGetItem);
+  return User.destroyAsync(keysNormalized(fields))
 }
 export function checkUserPassword({password, ...fields}) {
-  return getUser(keysNormalized(fields))
-  .then(comparePasswordToHash(password)); // returns error if fails
+  return getUserAndPass(keysNormalized(fields))
+    .then(comparePasswordToHash(password));
 }
 /** Authenticates a user from a JWT token and returns the user object */
-export function authenticateUser(token) {
-  const fields = decodeToken(token);
-  return getUser(fields)
+export function authenticateUser({jwtToken}) {
+  const fields = decodeToken(jwtToken);
+  return checkUserPassword(fields)
+    .then(R.unless(R.prop('isMatch'), R.always({})));
 }
 /** Creates a hash ("passwordHash") from the password field */
 function hashPassword(fields) {
@@ -88,20 +92,19 @@ function hashPassword(fields) {
 }
 /** Returns a function that compares fields.passwordHash to the password provided */
 function comparePasswordToHash(password) {
-  return (fields) => bcrypt.compare(password, fields.passwordHash);
+  return (fields) => {
+    return bcrypt.compare(password, fields.passwordHash)
+      .then(R.assoc('isMatch', R.__, fields))
+  }
 }
 /** Encodes a JWT token embedded the supplied fields */
 export function encodeToken(fields) {
-  return 'JWT ' + jwt.encode(JWTSecret);
+  return {jwtToken: ('JWT ' + jwt.encode(fields, JWTSecret))};
 }
 /** Decodes the "jwtToken" field into the contained attributes
     Token is in the format "JWT [token-string]" */
-function decodeToken(fields) {
-  try {
-    const tokenParts = (fields.jwtToken || '').split(' ');
-    if(tokenParts.length !== 2) throw Error('Invalid Token');
-    return jwt.decode(tokenParts[1], JWTSecret);
-  } catch (error) {
-    return {};
-  }
+function decodeToken(jwtToken) {
+  const tokenParts = (jwtToken || '').split(' ');
+  if(tokenParts.length !== 2) throw new Error('Invalid Token');
+  return jwt.decode(tokenParts[1], JWTSecret);
 }

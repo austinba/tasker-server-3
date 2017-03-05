@@ -22,6 +22,7 @@
     "dynogels-promisified": "1.0.4",
     "express": "4.15.0",
     "fs": "0.0.1-security",
+    "jwt-simple": "0.5.1",
     "normalize-email": "1.0.0",
     "path": "0.12.7",
     "ramda": "0.23.0",
