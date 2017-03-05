@@ -10,6 +10,7 @@ export const loadMockDataFrom = (model, data) => {
 export const loadMockData = () => {
   return Promise.all([
     loadMockDataFrom(Models.User, mockData.users),
-    loadMockDataFrom(Models.Task, mockData.tasks)
+    loadMockDataFrom(Models.Task, mockData.tasks),
+    loadMockDataFrom(Models.Team, mockData.teams)
   ]);
 };

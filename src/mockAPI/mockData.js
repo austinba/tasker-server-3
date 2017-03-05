@@ -132,5 +132,10 @@ export const users = [
   {username: 'chris',  teamdomain: 'qs', email: 'neversleep@gmail.com', passwordHash: 'samplehash', firstName: 'Chris',   lastName: 'Niel'}
 ];
 
+export const teams = [
+  {teamdomain: 'qs', teamName: 'Quarterstrech', firstUserID: 'austin'},
+  {teamdomain: 'slack', teamName: 'Slack', firstUserID: 'stewb'}
+]
+
 export const view = {
 };

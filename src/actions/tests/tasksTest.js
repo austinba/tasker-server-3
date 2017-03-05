@@ -9,7 +9,7 @@ const newTaskID = uuid();
 const newTask =
   {
     description: 'TESTING: this is created by a test',
-    assignedFrom: '00000000-0000-0000-0000-000000000102',
+    assignedFrom: 'austin@qs',
     dueDate: new Date(2017, 4, 1),
     level: 1,
   };
@@ -38,7 +38,7 @@ const test3 = () =>
   actions.editTask({
     taskID: '00000000-0000-0000-0000-000000000201',
     taskDetails: {
-      assignedTo: '00000000-0000-0000-0000-000000000101' }
+      assignedTo: '00austin@qs' }
     })
   .then(console.log)
   .catch(console.log.bind(null, 'error'));
@@ -62,8 +62,8 @@ const test5 = () =>
   actions.editTask({
     taskID: '00000000-0000-0000-0000-000000000202',
     taskDetails: {
-      assignedTo:   '00000000-0000-0000-0000-000000000101',
-      assignedFrom: '00000000-0000-0000-0000-000000000101' }
+      assignedTo:   'austin@qs',
+      assignedFrom: 'austin@qs' }
     })
   .then(console.log)
   .catch(console.log.bind(null, 'error'));
