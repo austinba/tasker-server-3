@@ -46,7 +46,7 @@ export const User = dynogels.define('qs-user', {
     lastName:     Joi.string().min(1).max(30)
   }
 });
-
+//
 // export const User = dynogels.define('qs-user', {
 //   hashKey:        'userID',
 //   timestamps:     true,
@@ -60,7 +60,7 @@ export const User = dynogels.define('qs-user', {
 //     lastName:     Joi.string().min(1).max(30),
 //   }
 // });
-
+//
 // export const Team = dynogels.define('qs-team', {
 //   hashKey:       'teamDomain',
 //   timestamps:    true,

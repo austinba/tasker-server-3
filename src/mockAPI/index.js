@@ -11,13 +11,11 @@ const getTaskIndex = (taskID) => R.findIndex(R.propEq('taskID', taskID))(tasks);
 // });
 
 export function checkIn({taskID}) {
-  return taskActions.checkIn({taskID}
-  ).then(R.pipe(R.prop('checkIns'), R.head))
+  return taskActions.checkIn({taskID})
 }
 
 export function cancelCheckIn({taskID}) {
-  return taskActions.undoCheckIn({taskID}
-  ).then(R.pipe(R.prop('checkIns'), R.head))
+  return taskActions.undoCheckIn({taskID})
 }
 
 export function getMyTasks() {
@@ -38,35 +36,18 @@ export function getUsers() {
   return userActions.getAllUsers().then(R.indexBy(R.prop('userID')));
 }
 export function markComplete({taskID}) {
-  const taskIndex = getTaskIndex(taskID);
-  if(taskIndex === -1) return Promise.reject();
-
-  tasks[taskIndex] = R.assoc('completionDate', new Date())(tasks[taskIndex])
-  console.log(tasks[taskIndex])
-  return Promise.resolve(tasks[taskIndex]);
+  return taskActions.markComplete({taskID});
 }
 
 export function markDeleted({taskID}) {
-  const taskIndex = getTaskIndex(taskID);
-  if(taskIndex === -1) return Promise.reject();
-
-  tasks[taskIndex] = R.assoc('deleteDate', new Date())(tasks[taskIndex])
-  return Promise.resolve(tasks[taskIndex]);
+  return taskActions.markDeleted({taskID});
 }
 
 export function unmarkComplete({taskID}) {
-  const taskIndex = getTaskIndex(taskID);
-  if(taskIndex === -1) return Promise.reject();
-
-  tasks[taskIndex] = R.dissoc('completionDate')(tasks[taskIndex])
-  return Promise.resolve(tasks[taskIndex]);
+  return taskActions.unmarkComplete({taskID});
 }
 export function unmarkDeleted({taskID}) {
-  const taskIndex = getTaskIndex(taskID);
-  if(taskIndex === -1) return Promise.reject();
-
-  tasks[taskIndex] = R.dissoc('deleteDate')(tasks[taskIndex])
-  return Promise.resolve(tasks[taskIndex]);
+  return taskActions.unmarkDeleted({taskID});
 }
 //
 //

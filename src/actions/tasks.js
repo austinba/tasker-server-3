@@ -18,21 +18,22 @@ const getRecentUserIDs =
     R.dropRepeats
   );
 
+const postProcessTask =
+  R.pipe(
+    R.converge(
+      R.assoc,
+      [ R.always('lastCheckInDate'),
+        R.pipe(R.prop('checkIns'), R.defaultTo([]), R.head, R.defaultTo(0)),
+        R.identity
+      ]
+    ),
+    R.omit('checkIns')
+  );
+
 function postProcessTaskList(dbPromise) {
   return Promise.resolve(dbPromise)
     .then(postProcessScan)
-    .then(  // process checkIn
-      R.map(
-        R.pipe(
-          R.converge(
-            R.assoc,
-            [ R.always('lastCheckInDate'),
-              R.pipe(R.prop('checkIns'), R.defaultTo([]), R.head, R.defaultTo(0)),
-              R.identity
-            ]
-          ),
-          R.omit('checkIns')
-        )))
+    .then(R.map(postProcessTask))
     .then(
       tasklist => ({
         tasks: R.pipe( // sort comments and index tasks
@@ -158,7 +159,16 @@ export function checkIn({taskID}) {
   // make sure task is not already checked in today
   params.ConditionExpression = 'attribute_not_exists(#checkIns) OR (NOT begins_with(#checkIns[0], :justDatePart))';
 
-  return Task.updateAsync({taskID}, params).then(postProcessGetItem);
+  // return Task.updateAsync({taskID}, params).then(postProcessGetItem);
+  return (
+    Task
+      .updateAsync({taskID}, params)
+      .then(postProcessGetItem)
+      .then(t => console.log(t) || t)
+      .then(postProcessTask)
+      .then(R.prop('lastCheckInDate'))
+    );
+
 }
 
 export function undoCheckIn({taskID}) {
@@ -175,7 +185,14 @@ export function undoCheckIn({taskID}) {
   // make sure task is not already checked in today
   params.ConditionExpression = 'attribute_exists(#checkIns) AND (begins_with(#checkIns[0], :justDatePart))';
 
-  return Task.updateAsync({taskID}, params).then(postProcessGetItem);
+  return (
+    Task
+      .updateAsync({taskID}, params)
+      .then(postProcessGetItem)
+      .then(t => console.log(t) || t)
+      .then(postProcessTask)
+      .then(R.prop('lastCheckInDate'))
+    );
 
 }
 
@@ -194,72 +211,3 @@ export function unmarkComplete({taskID}) {
 export function unmarkDeleted({taskID}) {
   return updateTask({taskID}, {deleteDate: null});
 }
-
-
-// export function markComplete({taskID}) {
-//   const taskIndex = getTaskIndex(taskID);
-//   if(taskIndex === -1) return Promise.reject();
-//
-//   tasks[taskIndex] = R.assoc('completionDate', new Date())(tasks[taskIndex])
-//   console.log(tasks[taskIndex])
-//   return Promise.resolve(tasks[taskIndex]);
-// }
-//
-// export function markDeleted({taskID}) {
-//   const taskIndex = getTaskIndex(taskID);
-//   if(taskIndex === -1) return Promise.reject();
-//
-//   tasks[taskIndex] = R.assoc('deleteDate', new Date())(tasks[taskIndex])
-//   return Promise.resolve(tasks[taskIndex]);
-// }
-//
-// export function unmarkComplete({taskID}) {
-//   const taskIndex = getTaskIndex(taskID);
-//   if(taskIndex === -1) return Promise.reject();
-//
-//   tasks[taskIndex] = R.dissoc('completionDate')(tasks[taskIndex])
-//   return Promise.resolve(tasks[taskIndex]);
-// }
-// export function unmarkDeleted({taskID}) {
-//   const taskIndex = getTaskIndex(taskID);
-//   if(taskIndex === -1) return Promise.reject();
-//
-//   tasks[taskIndex] = R.dissoc('deleteDate')(tasks[taskIndex])
-//   return Promise.resolve(tasks[taskIndex]);
-// }
-/** Should add a date to the list of checkins, IF one hasn't been already
-    included for today */
-//
-// export function checkIn({taskID}) {
-//   const now = new Date();
-//   const taskCheckIns = checkIns[taskID];
-//   if(!taskCheckIns) {
-//     checkIns[taskID] = [now];
-//     return Promise.resolve(now);
-//   }
-//   const mostRecent = taskCheckIns[0];
-//   const mostRecentDateString = new Date(mostRecent || 0).toJSON().split('T')[0];
-//   const nowDateString = now.toJSON().split('T')[0];
-//   if(nowDateString === mostRecentDateString) {
-//     delete taskCheckIns[0];
-//   }
-//   taskCheckIns.unshift(now);
-//   return Promise.resolve({date: now});
-// }
-//
-// export function cancelCheckIn({taskID}) {
-//   const now = new Date();
-//   const taskCheckIns = checkIns[taskID];
-//   if(!taskCheckIns) {
-//     checkIns[taskID] = [now];
-//     return Promise.resolve(0);
-//   }
-//   const mostRecent = taskCheckIns[0];
-//   const mostRecentDateString = new Date(mostRecent || 0).toJSON().split('T')[0];
-//   const nowDateString = now.toJSON().split('T')[0];
-//   if(nowDateString === mostRecentDateString) {
-//     delete taskCheckIns[0];
-//   }
-//   return Promise.resolve({date: taskCheckIns[0] || 0});
-//
-// }
