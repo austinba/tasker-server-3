@@ -5,8 +5,18 @@ import normalizeEmail from 'normalize-email';
 import jwt from 'jwt-simple';
 import { postProcessScan, postProcessGetItem } from './utilities';
 import { User } from '../model';
-import config from '../app_config.json';
-const JWTSecret = Buffer.from(config.jwt.secret, 'hex');
+
+let __JWTSecret;
+if(process.env.NODE_ENV === 'dev') {
+  const config = require('../app_config.json');
+  __JWTSecret = Buffer.from(config.jwt.secret, 'hex');
+} else {
+  __JWTSecret = process.env.JWT_SECRET;
+  if(!__JWTSecret) {
+    throw new Error('Must set JWT secret');
+  }
+}
+const JWTSecret = __JWTSecret;
 
 //
 // SECURITY NOTE: Only pass on password & password hash if absolutely necessary

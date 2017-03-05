@@ -42,7 +42,7 @@ const test14 = () => {
     .catch(console.log.bind(null, 'error'));
 }
 
-test14();
+// test14();
 
 // can create then delete a user
 // ensure password / hash are not present if intermediate object
@@ -50,18 +50,18 @@ const test2 = () => {
   const fields = {
     firstName: 'austin',
     lastName: 'baltes',
-    password: 'the-best',
+    password: 'thebest',
     teamdomain: 'qs',
-    username: 'a1bman',
+    username: 'abman1',
     email: 'aus@ba.com'};
   userActions.addUser(fields )
   .then(t=>console.log('intermediate result', t) || t)
   .catch(t=>console.log('intermediate failure', t) || t)
-  .then(userActions.deleteUser(fields))
+  .then(() => userActions.deleteUser(fields))
   .then(console.log.bind(null, 'successful delete'))
   .catch(console.log.bind(null, 'error'));
 }
-// test2();
+test2();
 
 
 // Try to login
