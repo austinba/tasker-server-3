@@ -55,7 +55,7 @@ export function createUserFromInvite(fields) {
 
 export function getInviteInfo(fields) {
   return Invite.getAsync(keysNormalized(fields))
-    .then(postProcessGetItem);
+    .then(postProcessGetItem)
 }
 
 export function addInvite(user, email) {

@@ -1,8 +1,5 @@
 import R from 'ramda';
 
-export const exampleUser = 'austin@qs';
-
-
 export const postProcessGetItem =
   R.pipe(R.defaultTo({}), R.prop('attrs'), R.defaultTo({}));
 

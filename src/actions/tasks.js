@@ -62,11 +62,15 @@ export function getTask(taskID) {
 }
 
 export function addTask({taskDetails, thisUser}) {
-  const {assignedTo, assignedFrom} = taskDetails;
+  const assignedTo   = R.trim(taskDetails.assignedTo || '');
+  const assignedFrom = R.trim(taskDetails.assignedFrom || '');
   const thisUserID = thisUser.userID;
+
+  console.log(thisUserID, assignedTo, assignedFrom)
   // Don't dual associate task
   if( assignedTo   === thisUserID &&
       assignedFrom === thisUserID) {
+        console.log('deleting assigned from')
     delete taskDetails['assignedFrom'];
   }
 
@@ -90,7 +94,8 @@ export function editTask({taskID, thisUser, taskDetails}) {
 
   // The task must exist if "editing" the task (otherwise, should be adding and tested aditionally)
   const updateConditions = { expected: { taskID: { Exists: true } } };  // make sure the task exists
-  const {assignedTo, assignedFrom} = taskDetails;
+  const assignedTo   = R.trim(taskDetails.assignedTo || '');
+  const assignedFrom = R.trim(taskDetails.assignedFrom || '');
   const thisUserID = thisUser.userID;
 
   // Don't dual associate task

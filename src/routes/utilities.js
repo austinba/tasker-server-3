@@ -6,7 +6,7 @@ export const routeHandler = (apiFn) => (req, res) => {
     R.when  (R.is(Array) , R.objOf('data')),
     R.unless(R.is(Object), R.objOf('data')),
     R.assoc ('thisUser'  , req.user), // assign the current user data to that object
-    R.evolve({thisUser: addUserID})
+    R.evolve({thisUser: addUserID}),
   )(req.body)
   apiFn(input)
     .then(data => typeof data !== 'object' ? {data} : data)
