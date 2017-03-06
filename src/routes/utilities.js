@@ -1,5 +1,14 @@
+import R from 'ramda';
+import { addUserID } from '../actions/users';
+
 export const routeHandler = (apiFn) => (req, res) => {
-  apiFn(req.body)
+  const input = R.pipe( // wrap if not an object
+    R.when  (R.is(Array) , R.objOf('data')),
+    R.unless(R.is(Object), R.objOf('data')),
+    R.assoc ('thisUser'  , req.user), // assign the current user data to that object
+    R.evolve({thisUser: addUserID})
+  )(req.body)
+  apiFn(input)
     .then(data => typeof data !== 'object' ? {data} : data)
     .then(data => res.send(data))
     .catch(err => console.log(err) || res.sendStatus(500));

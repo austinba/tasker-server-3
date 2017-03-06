@@ -1,4 +1,3 @@
-import { exampleUser } from './utilities';
 import R from 'ramda';
 import { postProcessScan, postProcessGetItem, postProcessGetItems } from './utilities';
 import { Task } from '../model';
@@ -6,9 +5,9 @@ import { Task } from '../model';
 // TODO: ensure any task modified is associated with the user
 // TODO: ensure any task viewed is associated with the user's team
 
-const getRecentUserIDs =
+const getRecentUserIDs = (thisUserID) =>
   R.pipe(
-    R.filter(task => task.assignedTo === exampleUser),
+    R.filter(task => task.assignedTo === thisUserID),
     R.map(task => [ task.assignedTo,
                     task.assignedFrom,
                     R.map(comment => comment.from)(task.comments || [])]),
@@ -29,8 +28,8 @@ const postProcessTask =
     R.omit('checkIns')
   );
 
-function postProcessTaskList(dbPromise) {
-  return Promise.resolve(dbPromise)
+const postProcessTaskList = (thisUserID) => (dbPromise) =>
+  Promise.resolve(dbPromise)
     .then(postProcessScan)
     .then(R.map(postProcessTask))
     .then(
@@ -38,42 +37,43 @@ function postProcessTaskList(dbPromise) {
         tasks: R.pipe( // sort comments and index tasks
                  R.map(R.evolve({ comments: R.sortWith([R.descend(R.prop('date'))]) })),
                  R.indexBy(R.prop('taskID')))(tasklist),
-        users: getRecentUserIDs(tasklist)
-    }))
-}
-export function getMyTasks() {
+        users: getRecentUserIDs(thisUserID)(tasklist)
+    }));
+export function getMyTasks({thisUser}) {
+  const thisUserID = thisUser.userID;
   return Task
     .scan()
-    .where('assignedTo').equals(exampleUser)
+    .where('assignedTo').equals(thisUserID)
     .execAsync()
-    .then(postProcessTaskList)
+    .then(postProcessTaskList(thisUserID))
 }
 
-export function getTasksIveAssigned() {
+export function getTasksIveAssigned({thisUser}) {
+  const thisUserID = thisUser.userID;
   return Task
     .scan()
-    .where('assignedFrom').equals(exampleUser)
+    .where('assignedFrom').equals(thisUserID)
     .execAsync()
-    .then(postProcessTaskList)
+    .then(postProcessTaskList(thisUserID))
 }
 
 export function getTask(taskID) {
   return Task.getAsync(taskID).then(postProcessGetItem);
 }
 
-export function addTask(taskDetails) {
+export function addTask({taskDetails, thisUser}) {
   const {assignedTo, assignedFrom} = taskDetails;
-
+  const thisUserID = thisUser.userID;
   // Don't dual associate task
-  if( assignedTo   === exampleUser &&
-      assignedFrom === exampleUser) {
+  if( assignedTo   === thisUserID &&
+      assignedFrom === thisUserID) {
     delete taskDetails['assignedFrom'];
   }
 
   // A new task must be associated with the current user in some way
-  if( assignedTo   !== exampleUser &&
-      assignedFrom !== exampleUser) {
-    taskDetails['assignedTo'] = exampleUser;  // new task HAS to be associated with a user
+  if( assignedTo   !== thisUserID &&
+      assignedFrom !== thisUserID) {
+    taskDetails['assignedTo'] = thisUserID;  // new task HAS to be associated with a user
   }
 
   // Task ID should be auto-generated if adding a task (allowing explicit selection could lead to vulnerabilities)
@@ -82,39 +82,39 @@ export function addTask(taskDetails) {
   return Task.createAsync(taskDetails).then(postProcessGetItem);
 }
 
-export function editTask({taskID, taskDetails}) {
-
+export function editTask({taskID, thisUser, taskDetails}) {
   // Check if actually adding a task
   if(taskID === 'adding-task') {
-    return addTask(taskDetails);
+    return addTask({taskDetails, thisUser});
   }
 
   // The task must exist if "editing" the task (otherwise, should be adding and tested aditionally)
   const updateConditions = { expected: { taskID: { Exists: true } } };  // make sure the task exists
   const {assignedTo, assignedFrom} = taskDetails;
+  const thisUserID = thisUser.userID;
 
   // Don't dual associate task
-  if( assignedTo   === exampleUser &&
-      assignedFrom === exampleUser) {
+  if( assignedTo   === thisUserID &&
+      assignedFrom === thisUserID) {
     delete taskDetails['assignedFrom'];
   }
 
   // Don't allow dual association to result from saving
-  if(assignedTo === exampleUser) {
-    updateConditions.expected['assignedFrom'] = { '<>': exampleUser };
-  } else if(assignedFrom === exampleUser) {
-    updateConditions.expected['assignedTo'] = { '<>': exampleUser };
+  if(assignedTo === thisUserID) {
+    updateConditions.expected['assignedFrom'] = { '<>': thisUserID };
+  } else if(assignedFrom === thisUserID) {
+    updateConditions.expected['assignedTo'] = { '<>': thisUserID };
   }
 
   // if something is being assigned
   if(assignedTo || assignedFrom) {
     // and the other isn't assigned to the current user,
     // make sure the current user is already assigned to the other
-    if(!assignedTo && (assignedFrom !== exampleUser)) {
-      updateConditions.expected['assignedTo'] = { E: exampleUser };
+    if(!assignedTo && (assignedFrom !== thisUserID)) {
+      updateConditions.expected['assignedTo'] = { E: thisUserID };
     }
-    if(!assignedFrom && (assignedTo !== exampleUser)) {
-      updateConditions.expected['assignedFrom'] = { E: exampleUser };
+    if(!assignedFrom && (assignedTo !== thisUserID)) {
+      updateConditions.expected['assignedFrom'] = { E: thisUserID };
     }
   }
 
@@ -124,10 +124,10 @@ export function editTask({taskID, taskDetails}) {
   // Make the update
   return Task.updateAsync({taskID, ...taskDetails}, updateConditions).then(postProcessGetItem);
 }
-export function saveComment({taskID, comment}) {
+export function saveComment({taskID, thisUser, comment}) {
   const params = {};
   const commentObj = {
-    from: exampleUser,
+    from: thisUser.userID,
     date: new Date().toJSON(),
     comment
   }
@@ -198,18 +198,23 @@ export function undoCheckIn({taskID}) {
         )));
 }
 
-export function markComplete({taskID}) {
-  return editTask({taskID, taskDetails: {completionDate: new Date().toJSON()}});
-}
+export const markComplete = R.pipe(
+  R.assoc('taskDetails', {completionDate: new Date().toJSON()}),
+  editTask
+);
 
-export function markDeleted({taskID}) {
-  return editTask({taskID, taskDetails: {deleteDate: new Date().toJSON()}});
-}
 
-export function unmarkComplete({taskID}) {
-  return editTask({taskID, taskDetails: {completionDate: null}});
-}
+export const markDeleted = R.pipe(
+  R.assoc('taskDetails', {deleteDate: new Date().toJSON()}),
+  editTask
+);
 
-export function unmarkDeleted({taskID}) {
-  return editTask({taskID, taskDetails: {deleteDate: null}});
-}
+export const unmarkComplete = R.pipe(
+  R.assoc('taskDetails', {completionDate: null}),
+  editTask
+);
+
+export const unmarkDeleted = R.pipe(
+  R.assoc('taskDetails', {deleteDate: null}),
+  editTask
+);

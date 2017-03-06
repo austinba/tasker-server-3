@@ -35,8 +35,8 @@ const fields = R.pick(['username', 'teamdomain', 'email', 'firstName', 'lastName
 const keysNormalized = R.pipe(keys, normalize);
 const tokenFieldsNormalized = R.pipe(tokenFields, normalize);
 const fieldsNormalized = R.pipe(fields, normalize);
-const addUserID = user => R.assoc('userID', joinUserID(user), user);
 const dropPasswordAndHash = R.pipe(R.dissoc('passwordHash'), R.dissoc('password'));
+export const addUserID = user => R.assoc('userID', joinUserID(user), user);
 
 
 export function getAllUsers() {
