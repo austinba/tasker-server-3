@@ -17,7 +17,7 @@ const test1 = () =>
   teamActions.getTeam({teamdomain: 'notateam'})
     .then(console.log).catch(console.log.bind(null, 'error'));
 
-// test1();
+test1();
 
 // add a team then delete that same team (TODO: in the future this should also delete all associated users, and probably just "mark the teamdomain" as deleted)
 const test2 = () => {

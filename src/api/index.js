@@ -2,7 +2,10 @@ import Promise from 'bluebird';
 import R from 'ramda';
 import * as userActions from '../actions/users';
 import * as taskActions from '../actions/tasks';
+import * as inviteActions from '../actions/invite';
 
+
+export const invite              = inviteActions.invite;
 export const checkIn             = taskActions.checkIn;
 export const cancelCheckIn       = taskActions.undoCheckIn;
 export const getMyTasks          = taskActions.getMyTasks;

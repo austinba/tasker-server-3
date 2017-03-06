@@ -25,7 +25,7 @@ export function addTeamWithInitialUser(fields) {
 }
 
 export function addTeam(fields) {
-  return Team.createAsync(fieldsNormalized(fields))
+  return Team.createAsync(fieldsNormalized(fields), { overwrite: false })
     .then(postProcessGetItem);
 }
 
@@ -34,6 +34,7 @@ export function deleteTeam(fields) {
 }
 
 export function getTeam(fields) {
+  console.log('get team', keysNormalized(fields))
   return Team.getAsync(keysNormalized(fields))
     .then(postProcessGetItem);
 }

@@ -44,9 +44,9 @@ export const User = dynogels.define('qs-user', {
   schema: {
     teamdomain:   Joi.string().lowercase().alphanum().min(1).max(15),
     username:     Joi.string().lowercase().alphanum().min(1).max(15),
-    email:        Joi.string().email().required(),
-    passwordHash: Joi.string().required(),
-    firstName:    Joi.string().min(1).max(30).required(),
+    email:        Joi.string().email(),
+    passwordHash: Joi.string(),
+    firstName:    Joi.string().min(1).max(30),
     lastName:     Joi.string().min(1).max(30)
   }
 });
@@ -56,8 +56,8 @@ export const Team = dynogels.define('qs-team', {
   timestamps:      true,
   schema: {
     teamdomain:    Joi.string().lowercase().alphanum().min(1).max(15),
-    teamName:      Joi.string().min(1).max(30).required(),
-    initialUserID: Joi.string().required()
+    teamName:      Joi.string().min(1).max(30),
+    initialUserID: Joi.string().lowercase()
   }
 });
 
@@ -69,6 +69,6 @@ export const Invite = dynogels.define('qs-invite', {
     inviteID:    dynogels.types.uuid(),
     teamdomain:  Joi.string().lowercase().alphanum().min(1).max(15),
     toEmail:     Joi.string().lowercase().email(),
-    fromUserID:  Joi.string().lowercase().alphanum().min(1).max(15)
+    fromUserID:  Joi.string().lowercase()
   }
 });

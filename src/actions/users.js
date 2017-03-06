@@ -5,6 +5,7 @@ import normalizeEmail from 'normalize-email';
 import jwt from 'jwt-simple';
 import { postProcessScan, postProcessGetItem } from './utilities';
 import { User } from '../model';
+import teamActions from './teams';
 
 let __JWTSecret;
 if(process.env.NODE_ENV === 'dev') {
@@ -84,14 +85,21 @@ export function getUsersFromIDs(ids) {
       dropPasswordAndHash
     )));
 }
-export function addUser(fields) {
+export function addUserWithPass(fields) {
+  console.log('ADD USER', fields)
   return hashPassword(fieldsNormalized(fields))
-    .then(R.omit('password')) // don't send to db, now that it is converted to a hash
-    .then(fields => User.createAsync(fields, { overwrite: false }))
+    .then(R.omit('password'))
+    .then(fieldsWHash =>
+      User.createAsync(fieldsWHash, { overwrite: false })
+    )
     .then(R.pipe(
-        postProcessGetItem,
-        dropPasswordAndHash
-      ));
+        postProcessGetItem
+    ))
+    .then(R.merge(fields));
+}
+export function addUser(fields) {
+  return addUserWithPass(fields)
+    .then(dropPasswordAndHash);
 }
 export function getUserAndPass(fields) {
   return User.getAsync(keysNormalized(fields))
@@ -128,7 +136,7 @@ export function authenticate({jwtToken}) {
       R.unless(R.prop('isMatch'), R.always({})),
       R.omit('isMatch')
     ))
-    .then(dropPasswordAndHash);
+    .then(dropPasswordAndHash)
 }
 /** Creates a hash ("passwordHash") from the password field */
 function hashPassword(fields) {
