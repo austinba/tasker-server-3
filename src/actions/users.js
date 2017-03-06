@@ -39,7 +39,7 @@ const dropPasswordAndHash = R.pipe(R.dissoc('passwordHash'), R.dissoc('password'
 export const addUserID = user => R.assoc('userID', joinUserID(user), user);
 
 
-export function getAllUsers() {
+function getAllUsers() {
   return User.scan().execAsync()
     .then(R.pipe(
       postProcessScan,
@@ -50,8 +50,8 @@ export function getAllUsers() {
     )) // add the compound userID
 }
 
-export function getAllUsersOnTeam(fields) {
-  const teamdomain = keysNormalized(fields).teamdomain
+export function getAllUsersOnUsersTeam({thisUser}) {
+  const {teamdomain} = thisUser;
   return (User.query(teamdomain)
     .loadAll()
     .execAsync()

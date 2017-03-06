@@ -17,6 +17,6 @@ export const saveComment         = R.pipeP(
                                      R.pipe(R.prop('comments'), R.head)
                                    )
 export const getUsers            = R.pipeP(
-                                      userActions.getAllUsers,
+                                      userActions.getAllUsersOnUsersTeam,
                                       R.indexBy(R.prop('userID'))
                                    )

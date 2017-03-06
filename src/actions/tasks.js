@@ -203,7 +203,6 @@ export const markComplete = R.pipe(
   editTask
 );
 
-
 export const markDeleted = R.pipe(
   R.assoc('taskDetails', {deleteDate: new Date().toJSON()}),
   editTask
