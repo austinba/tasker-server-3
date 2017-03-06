@@ -1,9 +1,8 @@
-import { prettyJSON } from '../helpers';
+import * as api from '../api/index';
 import express from 'express';
+import { routeHandler } from './utilities';
 const router = express.Router();
 
-router.get('/user-exists', function(req, res) {
-  res.send('no route defined');
-});
+router.post('/getUsers', routeHandler(api.getUsers));
 
 export default router;

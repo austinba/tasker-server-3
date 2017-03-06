@@ -3,6 +3,7 @@ import tasksRouter from './routes/tasks';
 import usersRouter from './routes/users';
 import mockAPIRouter from './mockAPI/routes';
 import loginRouter from './routes/login';
+import { routeReporter } from './routes/utilities';
 import { auth } from './auth';
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -14,20 +15,23 @@ const app = express();
 //   optionsSuccessStatus:200
 // };
 
+app.use(routeReporter);
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(cors());
 app.get('/', (req, res) => {
   res.send('Website is running');
 });
+app.use('/tasks', auth, tasksRouter);
+app.use('/users', auth, usersRouter);
 app.use('/tables', tableRouter);
-app.use('/tasks', tasksRouter);
-app.use('/users', usersRouter);
 app.use('/mockapi', mockAPIRouter);
 app.use('/login', loginRouter);
-app.get('/authtest', auth, function(req, res) {
-  res.send('you\'re authenticated!!!')
+
+app.get('/myinfo', auth, function(req, res) {
+  res.send(req.user);
 });
+
 
 app.set('port', process.env.PORT || 4000);
 app.listen(app.get('port'), function() {
